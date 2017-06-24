@@ -13,14 +13,14 @@ module SimpleOptParse
       commands_definition = params_definition.first
 
       if command == '-h' || command == '--help'
-        print_optparse_commands_help(commands_definition, output: output, is_error: false)
+        print_optparse_commands_help(commands_definition, output, false)
         output == $stdout ? exit : return
       end
 
       command_params_definition = commands_definition[command]
 
       if command_params_definition.nil?
-        print_optparse_commands_help(commands_definition, output: output, is_error: true)
+        print_optparse_commands_help(commands_definition, output, true)
         output == $stdout ? exit : return
       else
         return [command, decode_argv(*command_params_definition, arguments: arguments, output: output)]
@@ -106,7 +106,7 @@ module SimpleOptParse
 
   private
 
-  def print_optparse_commands_help(commands_definition, output:, is_error:)
+  def print_optparse_commands_help(commands_definition, output, is_error)
     output.print "Invalid command. " if is_error
     output.puts "Valid commands:", "", "  " + commands_definition.keys.join(', ')
   end

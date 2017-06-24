@@ -147,7 +147,75 @@ This is the long help!
 
   describe 'Multiple commands' do
 
-    it 'should be decoded'
+    describe 'regular case' do
+
+      let(:decoder_params) {{
+        'command1' => [
+          'arg1'
+        ],
+        'command2' => [
+          'arg2'
+        ],
+        output:     output_buffer,
+      }}
+
+      it 'should be decoded' do
+        decoder_params[:arguments] = ['command1', 'value1']
+
+        actual_result = described_class.decode_argv(decoder_params)
+
+        expected_result = ['command1', arg1: 'value1']
+
+        expect(actual_result).to eql(expected_result)
+      end
+
+      it 'print a message on wrong command' do
+        decoder_params[:arguments] = ['pizza']
+
+        described_class.decode_argv(decoder_params)
+
+        expected_output = %Q{\
+Invalid command. Valid commands:
+
+  command1, command2
+}
+
+        expect(output_buffer.string).to eql(expected_output)
+      end
+
+      it 'should implement the help' do
+        decoder_params[:arguments] = ['-h']
+
+        described_class.decode_argv(decoder_params)
+
+        expected_output = %Q{\
+Valid commands:
+
+  command1, command2
+}
+
+        expect(output_buffer.string).to eql(expected_output)
+      end
+
+    end
+
+    describe 'pitfall' do
+
+      let(:decoder_params) {{
+        output:     output_buffer,
+      }}
+
+      # Make sure that the options (in this case, :output) are not interpreted as commands definition.
+      #
+      it 'should be avoided' do
+        decoder_params[:arguments] = ['pizza']
+
+        actual_result = described_class.decode_argv(decoder_params)
+
+        expect(actual_result).to be(nil)
+      end
+
+    end
 
   end
 

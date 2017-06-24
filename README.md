@@ -45,39 +45,9 @@ This is the corresponding help:
 
     This is the long help! It can span multiple lines.
 
-Help
-----
+Guide
+-----
 
-*Switches:*
-
-Switches are defined as arrays; in the result, the key is the long (or, if not present, the short one) version name, as symbol (ie. `:xxx`):
-
-    ['-x', '--xxx [VALUENAME]'[, description]]
-
-If `VALUENAME` is not specified, the switch is considered a boolean, and evaluates to true/false.
-
-*Arguments:*
-
-Arguments are defined as strings; in the result, the key is the name, as symbol (ie. `:aaa`).
-
-    'aaa'
-    '*aaa'
-    '[bbb]'/[*bbb]'
-
-The star (`*`) indicates varargs; when there are brackets, indicates that the args are optional.  
-Brackets define optional arguments.  
-Optional arguments must follow mandatory ones.  
-Regular arguments and varargs can't be used together.
-
-*Method options:*
-
-    :long_help
-    :input:     for testing purposes; defaults to ARGV
-    :output:    for testing purposes; defaults to $stdout. IMPORTANT: if the value is different from
-                $stdout, `:decode_argv` will not call :exit, instead, it will return (nil).
-
-The switches `-h` and `--help` are added automatically.
-
-**Important:** This library doesn't raise an error on invalid definitions - their behavior is undefined.
+For the guide, see the [wiki page](https://github.com/saveriomiroddi/simpleoptparse/wiki/Guide).
 
 [BS img]: https://travis-ci.org/saveriomiroddi/simpleoptparse.svg?branch=master

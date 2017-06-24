@@ -38,46 +38,46 @@ This is a sample result:
 
 This is the corresponding help:
 
-    ARGS: <schedule> [<weeks>]
-
-    Usage: tmpfile [options]
+    Usage: tmpfile [options] <schedule> [<weeks>]
         -s, --only-scheduled-days        Only print scheduled days
         -d, --print-defaults TEMPLATE    Print the default activities from the named template
         -h, --help                       Help
 
-    << Here starts the provided long help... >>
+    This is the long help! It can span multiple lines.
 
 Help
 ----
 
-**Important:** This library doesn't raise an error on invalid definitions - their behavior is undefined.
+*Switches:*
 
-Switches:
+Switches are defined as arrays; in the result, the key is the long (or, if not present, the short one) version name, as symbol (ie. `:xxx`):
 
     ['-x', '--xxx [VALUENAME]'[, description]]
 
-The key will be the long (or, if not present, the short one) version name, as symbol (ie. `:xxx`).
 If `VALUENAME` is not specified, the switch is considered a boolean, and evaluates to true/false.
 
-Arguments:
+*Arguments:*
+
+Arguments are defined as strings; in the result, the key is the name, as symbol (ie. `:aaa`).
 
     'aaa'
     '*aaa'
     '[bbb]'/[*bbb]'
 
-The key is the name, as symbol (ie. :aaa). Can be a simple string not in an array.
-The star (`*`) indicates varargs; when there are brackets, indicates that the args are optional.
-Brackets define optional arguments.
-Optional arguments must follow mandatory ones.
+The star (`*`) indicates varargs; when there are brackets, indicates that the args are optional.  
+Brackets define optional arguments.  
+Optional arguments must follow mandatory ones.  
 Regular arguments and varargs can't be used together.
 
-Switches:
+*Method options:*
 
     :long_help
     :input:     for testing purposes; defaults to ARGV
-    :output:    for testing purposes; defaults to $stdout. IMPORTANT: if this is not $stdout, the
-                :decode_argv will not call :exit, instead, it will return.
+    :output:    for testing purposes; defaults to $stdout. IMPORTANT: if the value is different from
+                $stdout, `:decode_argv` will not call :exit, instead, it will return (nil).
 
 The switches `-h` and `--help` are added automatically.
+
+**Important:** This library doesn't raise an error on invalid definitions - their behavior is undefined.
 
 [BS img]: https://travis-ci.org/saveriomiroddi/simpleoptparse.svg?branch=master

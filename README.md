@@ -2,16 +2,16 @@
 
 # SimpleScripting
 
-SS is a library composed of two modules (`Argv` and `Configuration`) which simplify two common scripting tasks:
+`SS` is a library composed of two modules (`Argv` and `Configuration`) which simplify two common scripting tasks:
 
 - implementing the commandline options parsing (and the related help)
 - loading and decoding the configuration for the script/application
 
-SS is an interesting (and useful) exercise in design, aimed at finding the simplest and most expressive data/structures which accomplish the given task(s). For this reason, the library can be useful for people who frequently write small scripts (eg. devops or nerds).
+`SS` is an interesting (and useful) exercise in design, aimed at finding the simplest and most expressive data/structures which accomplish the given task(s). For this reason, the library can be useful for people who frequently write small scripts (eg. devops or nerds).
 
 ## SimpleScripting::Argv
 
-SSA is a module which acts as frontend to the standard Option Parser library (`optparse`), giving a very convenient format for specifying the arguments. SSA also generates the help.
+`SS::A` is a module which acts as frontend to the standard Option Parser library (`optparse`), giving a very convenient format for specifying the arguments. `SS::A` also generates the help.
 
 This is a definition example:
 
@@ -55,7 +55,7 @@ For the guide, see the [wiki page](https://github.com/saveriomiroddi/simplescrip
 
 ## SimpleScripting::Configuration
 
-SSC is a module which acts as frontend to the ParseConfig gem (`parseconfig`), giving compact access to the configuration and its values, and adding a few helpers for common tasks.
+`SS::C` is a module which acts as frontend to the ParseConfig gem (`parseconfig`), giving compact access to the configuration and its values, and adding a few helpers for common tasks.
 
 Say one writes a script (`foo_my_bar.rb`), with a corresponding (`$HOME/.foo_my_bar`) configuration, which contains:
 
@@ -66,7 +66,7 @@ Say one writes a script (`foo_my_bar.rb`), with a corresponding (`$HOME/.foo_my_
     [a_group]
     group_key=baz
 
-This is the workflow and functionality offered by SSC:
+This is the workflow and functionality offered by `SS::C`:
 
     # Picks up automatically the configuration file name, based on the calling program
     #
@@ -84,4 +84,4 @@ This is the workflow and functionality offered by SSC:
 
 The purpose of encryption in this library is just to avoid displaying passwords in plaintext; it's not considered safe against attacks.
 
-[BS img]: https://travis-ci.org/saveriomiroddi/simpleoptparse.svg?branch=master
+[BS img]: https://travis-ci.org/saveriomiroddi/simplescripting.svg?branch=master

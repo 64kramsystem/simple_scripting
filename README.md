@@ -1,15 +1,21 @@
-[![Build Status][BS img]](https://travis-ci.org/saveriomiroddi/simpleoptparse)
+[![Build Status][BS img]](https://travis-ci.org/saveriomiroddi/simplescripting)
 
-Simple Option Parser
-====================
+# SimpleScripting
 
-SOP is a library which acts as frontend to the standard Option Parser library (`optparse`), giving a very convenient format for specifying the arguments, along with automatic help.
+SS is a library composed of two modules (`Argv` and `Configuration`) which simplify two common scripting tasks:
 
-SOP is very useful for people who frequently write small scripts (eg. devops) and want to handle options parsing in a compact and automated way.
+- implementing the commandline options parsing (and the related help)
+- loading and decoding the configuration for the script/application
+
+SS is an interesting (and useful) exercise in design, aimed at finding the simplest and most expressive data/structures which accomplish the given task(s). For this reason, the library can be useful for people who frequently write small scripts (eg. devops or nerds).
+
+## SimpleScripting::Argv
+
+SSA is a module which acts as frontend to the standard Option Parser library (`optparse`), giving a very convenient format for specifying the arguments. SSA also generates the help.
 
 This is a definition example:
 
-    result = SimpleOptParse.decode_argv(
+    result = SimpleOptParse::Argv.decode(
       ['-s', '--only-scheduled-days',     'Only print scheduled days'                           ],
       ['-d', '--print-defaults TEMPLATE', 'Print the default activities from the named template'],
       'schedule',
@@ -45,9 +51,37 @@ This is the corresponding help:
 
     This is the long help! It can span multiple lines.
 
-Guide
------
+For the guide, see the [wiki page](https://github.com/saveriomiroddi/simplescripting/wiki/SimpleScripting::Argv-Guide).
 
-For the guide, see the [wiki page](https://github.com/saveriomiroddi/simpleoptparse/wiki/Guide).
+## SimpleScripting::Configuration
+
+SSC is a module which acts as frontend to the ParseConfig gem (`parseconfig`), giving compact access to the configuration and its values, and adding a few helpers for common tasks.
+
+Say one writes a script (`foo_my_bar.rb`), with a corresponding (`$HOME/.foo_my_bar`) configuration, which contains:
+
+    some_relative_file_path=foo
+    some_absolute_file_path=/path/to/bar
+    my_password=uTxllKRD2S+IH92oi30luwu0JIqp7kKA
+
+    [a_group]
+    group_key=baz
+
+This is the workflow and functionality offered by SSC:
+
+    # Picks up automatically the configuration file name, based on the calling program
+    #
+    configuration = SimpleScripting::Configuration.load(passwords_key: 'encryption_key')
+
+    configuration.some_relative_file_path.full_path # '$HOME/foo'
+    configuration.some_absolute_file_path           # '/path/to/bar'
+    configuration.some_absolute_file_path.full_path # '/path/to/bar' (recognized as absolute)
+
+    configuration.my_password.decrypted             # 'encrypted_value'
+
+    configuration.a_group.group_key                 # 'baz'; also supports #full_path and #decrypted
+
+### Encryption note
+
+The purpose of encryption in this library is just to avoid displaying passwords in plaintext; it's not considered safe against attacks.
 
 [BS img]: https://travis-ci.org/saveriomiroddi/simpleoptparse.svg?branch=master

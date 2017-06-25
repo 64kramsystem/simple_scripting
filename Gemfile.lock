@@ -2,6 +2,7 @@ GEM
   remote: https://rubygems.org/
   specs:
     diff-lcs (1.3)
+    parseconfig (1.0.8)
     rake (12.0.0)
     rspec (3.6.0)
       rspec-core (~> 3.6.0)
@@ -21,6 +22,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  parseconfig (~> 1.0.8)
   rake (~> 12.0.0)
   rspec (~> 3.6.0)
 

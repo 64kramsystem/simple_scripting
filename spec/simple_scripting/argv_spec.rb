@@ -1,8 +1,8 @@
-require_relative '../lib/simpleoptparse.rb'
+require_relative '../../lib/simple_scripting/argv.rb'
 
 require 'stringio'
 
-describe SimpleOptParse do
+describe SimpleScripting::Argv do
 
   let(:output_buffer) do
     StringIO.new
@@ -26,7 +26,7 @@ describe SimpleOptParse do
     it 'should implement the help' do
       decoder_params.last[:arguments] = ['-h']
 
-      described_class.decode_argv(*decoder_params)
+      described_class.decode(*decoder_params)
 
       expected_output = %Q{\
 Usage: rspec [options] <mandatory> [<optional>]
@@ -47,7 +47,7 @@ This is the long help!
     it "should implement basic switches and arguments (all set)" do
       decoder_params.last[:arguments] = ['-a', '-b', '-c', '-d', '-ev_swt', '-fv_swt', 'm_arg', 'o_arg']
 
-      actual_result = described_class.decode_argv(*decoder_params)
+      actual_result = described_class.decode(*decoder_params)
 
       expected_result = {
         a:          true,
@@ -66,7 +66,7 @@ This is the long help!
     it "should implement basic switches and arguments (no optional argument)" do
       decoder_params.last[:arguments] = ['m_arg']
 
-      actual_result = described_class.decode_argv(*decoder_params)
+      actual_result = described_class.decode(*decoder_params)
 
       expected_result = {
         mandatory: 'm_arg',
@@ -89,7 +89,7 @@ This is the long help!
       it "should be decoded" do
         decoder_params.last[:arguments] = ['varval1', 'varval2']
 
-        actual_result = described_class.decode_argv(*decoder_params)
+        actual_result = described_class.decode(*decoder_params)
 
         expected_result = {
           varargs:   ['varval1', 'varval2'],
@@ -101,7 +101,7 @@ This is the long help!
       it "should exit when they are not specified" do
         decoder_params.last[:arguments] = []
 
-        actual_result = described_class.decode_argv(*decoder_params)
+        actual_result = described_class.decode(*decoder_params)
 
         expected_result = nil
 
@@ -120,7 +120,7 @@ This is the long help!
       it "should be decoded" do
         decoder_params.last[:arguments] = ['varval1', 'varval2']
 
-        actual_result = described_class.decode_argv(*decoder_params)
+        actual_result = described_class.decode(*decoder_params)
 
         expected_result = {
           varargs:   ['varval1', 'varval2'],
@@ -132,7 +132,7 @@ This is the long help!
       it "should be allowed not to be specified" do
         decoder_params.last[:arguments] = []
 
-        actual_result = described_class.decode_argv(*decoder_params)
+        actual_result = described_class.decode(*decoder_params)
 
         expected_result = {
           varargs:   [],
@@ -162,7 +162,7 @@ This is the long help!
       it 'should be decoded' do
         decoder_params[:arguments] = ['command1', 'value1']
 
-        actual_result = described_class.decode_argv(decoder_params)
+        actual_result = described_class.decode(decoder_params)
 
         expected_result = ['command1', arg1: 'value1']
 
@@ -172,7 +172,7 @@ This is the long help!
       it 'print a message on wrong command' do
         decoder_params[:arguments] = ['pizza']
 
-        described_class.decode_argv(decoder_params)
+        described_class.decode(decoder_params)
 
         expected_output = %Q{\
 Invalid command. Valid commands:
@@ -186,7 +186,7 @@ Invalid command. Valid commands:
       it 'should implement the help' do
         decoder_params[:arguments] = ['-h']
 
-        described_class.decode_argv(decoder_params)
+        described_class.decode(decoder_params)
 
         expected_output = %Q{\
 Valid commands:
@@ -210,7 +210,7 @@ Valid commands:
       it 'should be avoided' do
         decoder_params[:arguments] = ['pizza']
 
-        actual_result = described_class.decode_argv(decoder_params)
+        actual_result = described_class.decode(decoder_params)
 
         expect(actual_result).to be(nil)
       end

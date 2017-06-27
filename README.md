@@ -1,4 +1,4 @@
-[![Build Status][BS img]](https://travis-ci.org/saveriomiroddi/simplescripting)
+[![Build Status][BS img]](https://travis-ci.org/saveriomiroddi/simple_scripting)
 
 # SimpleScripting
 
@@ -51,7 +51,7 @@ This is the corresponding help:
 
     This is the long help! It can span multiple lines.
 
-For the guide, see the [wiki page](https://github.com/saveriomiroddi/simplescripting/wiki/SimpleScripting::Argv-Guide).
+For the guide, see the [wiki page](https://github.com/saveriomiroddi/simple_scripting/wiki/SimpleScripting::Argv-Guide).
 
 ## SimpleScripting::Configuration
 
@@ -84,4 +84,4 @@ This is the workflow and functionality offered by `SS::C`:
 
 The purpose of encryption in this library is just to avoid displaying passwords in plaintext; it's not considered safe against attacks.
 
-[BS img]: https://travis-ci.org/saveriomiroddi/simplescripting.svg?branch=master
+[BS img]: https://travis-ci.org/saveriomiroddi/simple_scripting.svg?branch=master

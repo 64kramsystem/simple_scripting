@@ -212,15 +212,13 @@ Usage: rspec command1 [options] <arg1>
 
     end
 
-    describe 'pitfall' do
+    describe 'No argv case' do
 
       let(:decoder_params) {{
         output:     output_buffer,
       }}
 
-      # Make sure that the options (in this case, :output) are not interpreted as commands definition.
-      #
-      it 'should be avoided' do
+      it 'should avoided options being interpreted as definitions' do
         decoder_params[:arguments] = ['pizza']
 
         actual_result = described_class.decode(decoder_params)

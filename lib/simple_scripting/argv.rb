@@ -33,8 +33,8 @@ module SimpleScripting
       parser_opts_ref  = nil  # not available outside the block
       args             = {}   # { 'name' => mandatory? }
 
-      OptionParser.new do | parser_opts |
-        params_definition.each do | param_definition |
+      OptionParser.new do |parser_opts|
+        params_definition.each do |param_definition|
           case param_definition
           when Array
             if param_definition[1] && param_definition[1].start_with?('--')
@@ -61,8 +61,8 @@ module SimpleScripting
           end
         end
 
-        parser_opts.on( '-h', '--help', 'Help' ) do
-          print_optparse_help( parser_opts, args, long_help, output, command: command )
+        parser_opts.on('-h', '--help', 'Help') do
+          print_optparse_help(parser_opts, args, long_help, output, command: command)
           output == $stdout ? exit : return
         end
 
@@ -76,25 +76,25 @@ module SimpleScripting
         # Mandatory?
         if args.fetch(first_arg_name.to_sym)
           if arguments.empty?
-            print_optparse_help( parser_opts_ref, args, long_help, output, command: command )
+            print_optparse_help(parser_opts_ref, args, long_help, output, command: command)
             output == $stdout ? exit : return
           else
-            name = args.keys.first[ 1 .. - 1 ].to_sym
+            name = args.keys.first[1..-1].to_sym
 
-            result[ name ] = arguments
+            result[name] = arguments
           end
         # Optional
         else
-          name = args.keys.first[ 1 .. - 1 ].to_sym
+          name = args.keys.first[1..-1].to_sym
 
-          result[ name ] = arguments
+          result[name] = arguments
         end
       else
-        min_args_size = args.count { | name, mandatory | mandatory }
+        min_args_size = args.count { |name, mandatory| mandatory }
 
         case arguments.size
         when (min_args_size .. args.size)
-          arguments.zip(args) do | value, (name, mandatory) |
+          arguments.zip(args) do |value, (name, mandatory)|
             result[name] = value
           end
         else
@@ -121,7 +121,7 @@ module SimpleScripting
       end
 
       if args.size > 0
-        args_display = args.map { | name, mandatory | mandatory ? "<#{ name }>" : "[<#{ name }>]" }.join(' ')
+        args_display = args.map { |name, mandatory| mandatory ? "<#{ name }>" : "[<#{ name }>]" }.join(' ')
         parser_opts_help = parser_opts_help.sub!(/^(Usage: .*)/, "\\1 #{args_display}")
       end
 

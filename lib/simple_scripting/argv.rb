@@ -6,7 +6,7 @@ module SimpleScripting
 
     extend self
 
-    def decode(*params_definition, arguments: ARGV, long_help: nil, output: $stdout)
+    def decode(*params_definition, arguments: ARGV, long_help: nil, output: $stdout, command: nil)
       # If the param is a Hash, we have multiple commands. We check and if the command is correct,
       # recursively call the function with the specific parameters.
       #
@@ -25,7 +25,7 @@ module SimpleScripting
           print_optparse_commands_help(commands_definition, output, true)
           output == $stdout ? exit : return
         else
-          return [command, decode(*command_params_definition, arguments: arguments, output: output)]
+          return [command, decode(*command_params_definition, arguments: arguments, output: output, command: command)]
         end
       end
 
@@ -62,7 +62,7 @@ module SimpleScripting
         end
 
         parser_opts.on( '-h', '--help', 'Help' ) do
-          print_optparse_help( parser_opts, args, long_help, output )
+          print_optparse_help( parser_opts, args, long_help, output, command: command )
           output == $stdout ? exit : return
         end
 
@@ -76,7 +76,7 @@ module SimpleScripting
         # Mandatory?
         if args.fetch(first_arg_name.to_sym)
           if arguments.empty?
-            print_optparse_help( parser_opts_ref, args, long_help, output )
+            print_optparse_help( parser_opts_ref, args, long_help, output, command: command )
             output == $stdout ? exit : return
           else
             name = args.keys.first[ 1 .. - 1 ].to_sym
@@ -98,7 +98,7 @@ module SimpleScripting
             result[name] = value
           end
         else
-          print_optparse_help(parser_opts_ref, args, long_help, output)
+          print_optparse_help(parser_opts_ref, args, long_help, output, command: command)
           output == $stdout ? exit : return
         end
       end
@@ -113,9 +113,17 @@ module SimpleScripting
       output.puts "Valid commands:", "", "  " + commands_definition.keys.join(', ')
     end
 
-    def print_optparse_help(parser_opts, args, long_help, output)
-      args_display = args.map { | name, mandatory | mandatory ? "<#{ name }>" : "[<#{ name }>]" }.join(' ')
-      parser_opts_help = parser_opts.to_s.sub!(/^(Usage: .*)/, "\\1 #{args_display}")
+    def print_optparse_help(parser_opts, args, long_help, output, command: nil)
+      parser_opts_help = parser_opts.to_s
+
+      if command
+        parser_opts_help = parser_opts_help.sub!(/(\[options\])/, "#{command} \\1")
+      end
+
+      if args.size > 0
+        args_display = args.map { | name, mandatory | mandatory ? "<#{ name }>" : "[<#{ name }>]" }.join(' ')
+        parser_opts_help = parser_opts_help.sub!(/^(Usage: .*)/, "\\1 #{args_display}")
+      end
 
       output.puts parser_opts_help
       output.puts "", long_help if long_help

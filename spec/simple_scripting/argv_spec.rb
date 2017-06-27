@@ -183,7 +183,7 @@ Invalid command. Valid commands:
         expect(output_buffer.string).to eql(expected_output)
       end
 
-      it 'should implement the help' do
+      it 'should implement the commands help' do
         decoder_params[:arguments] = ['-h']
 
         described_class.decode(decoder_params)
@@ -192,6 +192,19 @@ Invalid command. Valid commands:
 Valid commands:
 
   command1, command2
+}
+
+        expect(output_buffer.string).to eql(expected_output)
+      end
+
+      it "should display the command given command's help" do
+        decoder_params[:arguments] = ['command1', '-h']
+$a = true
+        described_class.decode(decoder_params)
+
+        expected_output = %Q{\
+Usage: rspec command1 [options] <arg1>
+    -h, --help                       Help
 }
 
         expect(output_buffer.string).to eql(expected_output)

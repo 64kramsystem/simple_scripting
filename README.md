@@ -15,6 +15,8 @@
 
 This is a definition example:
 
+    require 'simple_scripting/argv'
+
     result = SimpleOptParse::Argv.decode(
       ['-s', '--only-scheduled-days',     'Only print scheduled days'                           ],
       ['-d', '--print-defaults TEMPLATE', 'Print the default activities from the named template'],
@@ -67,6 +69,8 @@ Say one writes a script (`foo_my_bar.rb`), with a corresponding (`$HOME/.foo_my_
     group_key=baz
 
 This is the workflow and functionality offered by `SS::C`:
+
+    require 'simple_scripting/configuration'
 
     # Picks up automatically the configuration file name, based on the calling program
     #

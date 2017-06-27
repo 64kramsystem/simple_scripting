@@ -22,9 +22,9 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  parseconfig (~> 1.0.8)
-  rake (~> 12.0.0)
-  rspec (~> 3.6.0)
+  parseconfig (~> 1.0)
+  rake (~> 12.0)
+  rspec (~> 3.6)
 
 BUNDLED WITH
    1.11.2

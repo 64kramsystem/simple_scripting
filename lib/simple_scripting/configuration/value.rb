@@ -24,6 +24,10 @@ module SimpleScripting
         start_with?('/') ? self : File.expand_path(self, '~')
       end
 
+      def full_paths
+        split(':').map { |value| self.class.new(value).full_path }
+      end
+
       def decrypted
         raise "Encryption key not provided!" if @encryption_key.nil?
 

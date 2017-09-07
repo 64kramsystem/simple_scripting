@@ -63,6 +63,7 @@ Say one writes a script (`foo_my_bar.rb`), with a corresponding (`$HOME/.foo_my_
 
     some_relative_file_path=foo
     some_absolute_file_path=/path/to/bar
+    multiple_paths=foo:/path/to/bar
     my_password=uTxllKRD2S+IH92oi30luwu0JIqp7kKA
 
     [a_group]
@@ -79,6 +80,7 @@ This is the workflow and functionality offered by `SS::C`:
     configuration.some_relative_file_path.full_path # '$HOME/foo'
     configuration.some_absolute_file_path           # '/path/to/bar'
     configuration.some_absolute_file_path.full_path # '/path/to/bar' (recognized as absolute)
+    configuration.multiple_paths.full_paths         # ['$HOME/foo', '/path/to/bar']
 
     configuration.my_password.decrypted             # 'encrypted_value'
 

@@ -23,6 +23,7 @@ describe SimpleScripting::Configuration do
   let(:configuration_text) {"
 abspath_key=/tmp/bar
 relpath_key=foo
+mixed_multiple_paths_key=/tmp/bar:foo
 encr_key=uTxllKRD2S+IH92oi30luwu0JIqp7kKA
 
 [group1]
@@ -39,6 +40,8 @@ g2_key=bang
       expect(configuration.abspath_key.full_path).to eql('/tmp/bar')
 
       expect(configuration.relpath_key.full_path).to eql(File.expand_path('foo', '~'))
+
+      expect(configuration.mixed_multiple_paths_key.full_paths).to eql(['/tmp/bar', File.expand_path('foo', '~')])
 
       expect(configuration.encr_key.decrypted).to eql('encrypted_value')
 

@@ -90,8 +90,8 @@ This is the workflow and functionality offered by `SS::C`:
 
 The purpose of encryption in this library is just to avoid displaying passwords in plaintext; it's not considered safe against attacks.
 
-[BS img]: https://travis-ci.org/saveriomiroddi/simple_scripting.svg?branch=master
-
 ## Help
 
 See the [wiki](https://github.com/saveriomiroddi/simple_scripting/wiki) for additional help.
+
+[BS img]: https://travis-ci.org/saveriomiroddi/simple_scripting.svg?branch=master

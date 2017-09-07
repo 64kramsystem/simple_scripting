@@ -20,6 +20,7 @@ Gem::Specification.new do |s|
 
   s.add_development_dependency "rake",        "~> 12.0"
   s.add_development_dependency "rspec",       "~> 3.6"
+  s.add_development_dependency 'coveralls',   "~> 0.8.21"
 
   s.files         = `git ls-files`.split("\n")
   s.test_files    = `git ls-files -- spec/*`.split("\n")

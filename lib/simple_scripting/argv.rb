@@ -9,6 +9,8 @@ module SimpleScripting
     extend self
 
     def decode(*params_definition, arguments: ARGV, long_help: nil, output: $stdout)
+      # WATCH OUT! @long_help can also be set in :decode_command!. See issue #17.
+      #
       @long_help = long_help
       @output = output
 
@@ -52,6 +54,11 @@ module SimpleScripting
       if command_params_definition.nil?
         print_optparse_commands_help(command, commands_definition)
       else
+        if command_params_definition.last.is_a?(Hash)
+          internal_params = command_params_definition.pop # only long_help is here, if present
+          @long_help = internal_params.delete(:long_help)
+        end
+
         [
           command,
           decode_arguments!(command_params_definition, arguments, command),

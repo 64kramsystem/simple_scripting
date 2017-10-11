@@ -151,7 +151,8 @@ This is the long help!
 
       let(:decoder_params) {{
         'command1' => [
-          'arg1'
+          'arg1',
+          long_help: 'This is the long help.'
         ],
         'command2' => [
           'arg2'
@@ -205,6 +206,8 @@ $a = true
         expected_output = %Q{\
 Usage: rspec command1 [options] <arg1>
     -h, --help                       Help
+
+This is the long help.
 }
 
         expect(output_buffer.string).to eql(expected_output)

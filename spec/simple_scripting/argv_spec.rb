@@ -145,7 +145,7 @@ This is the long help!
 
   end
 
-  describe 'Multiple commands' do
+  describe 'Commands' do
 
     describe 'regular case' do
 
@@ -213,6 +213,54 @@ This is the long help.
         expect(output_buffer.string).to eql(expected_output)
       end
 
+    end
+
+    describe 'Nested commands' do
+
+      let(:decoder_params) {{
+        'command1' => {
+          'nested1a' => [
+            'arg1',
+            long_help: 'nested1a long help.'
+          ],
+          'nested1b' => [
+            'arg1b'
+          ],
+        },
+        'command2' => [
+          'arg2'
+        ],
+        output:     output_buffer
+      }}
+
+      it 'should print the command1 help' do
+        decoder_params[:arguments] = ['command1', '-h']
+
+        actual_result = described_class.decode(decoder_params)
+
+        expected_output = "\
+Valid commands:
+
+  nested1a, nested1b
+"
+
+        expect(output_buffer.string).to eql(expected_output)
+      end
+
+      it 'should print the nested1a help, and long help' do
+        decoder_params[:arguments] = ['command1', 'nested1a', '-h']
+
+        actual_result = described_class.decode(decoder_params)
+
+        expected_output = "\
+Usage: rspec command1 nested1a [options] <arg1>
+    -h, --help                       Help
+
+nested1a long help.
+"
+
+        expect(output_buffer.string).to eql(expected_output)
+      end
     end
 
     describe 'No argv case' do

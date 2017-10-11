@@ -17,7 +17,7 @@ module SimpleScripting
       if params_definition.first.is_a?(Hash)
         decode_command!(params_definition, arguments)
       else
-        decode_arguments!(params_definition, arguments, nil)
+        decode_arguments!(params_definition, arguments)
       end
     rescue ExitError
       exit if output == $stdout
@@ -36,7 +36,11 @@ module SimpleScripting
 
     # MAIN CASES ###########################################
 
-    def decode_command!(params_definition, arguments)
+    # Input params_definition for a non-nested case:
+    #
+    #   [{"command1"=>["arg1", {:long_help=>"This is the long help."}], "command2"=>["arg2"]}]
+    #
+    def decode_command!(params_definition, arguments, commands_stack=[])
       commands_definition = params_definition.first
 
       # Set the `command` variable only after; in the case where we print the help, this variable
@@ -51,9 +55,18 @@ module SimpleScripting
       command = command_for_check
       command_params_definition = commands_definition[command]
 
-      if command_params_definition.nil?
+      case command_params_definition
+      when nil
         print_optparse_commands_help(command, commands_definition)
+      when Hash
+        commands_stack << command
+
+        # Nested case! Decode recursively
+        #
+        decode_command!([command_params_definition], arguments, commands_stack)
       else
+        commands_stack << command
+
         if command_params_definition.last.is_a?(Hash)
           internal_params = command_params_definition.pop # only long_help is here, if present
           @long_help = internal_params.delete(:long_help)
@@ -61,12 +74,12 @@ module SimpleScripting
 
         [
           command,
-          decode_arguments!(command_params_definition, arguments, command),
+          decode_arguments!(command_params_definition, arguments, commands_stack),
         ]
       end
     end
 
-    def decode_arguments!(params_definition, arguments, command)
+    def decode_arguments!(params_definition, arguments, commands_stack=[])
       result           = {}
       parser_opts_copy = nil  # not available outside the block
       args             = {}   # { 'name' => mandatory? }
@@ -84,7 +97,7 @@ module SimpleScripting
         end
 
         parser_opts.on('-h', '--help', 'Help') do
-          print_optparse_arguments_help(command, args, parser_opts_copy)
+          print_optparse_arguments_help(commands_stack, args, parser_opts_copy)
         end
 
         parser_opts_copy = parser_opts
@@ -93,9 +106,9 @@ module SimpleScripting
       first_arg_name = args.keys.first.to_s
 
       if first_arg_name.start_with?('*')
-        process_varargs!(arguments, result, command, args, parser_opts_copy)
+        process_varargs!(arguments, result, commands_stack, args, parser_opts_copy)
       else
-        process_regular_argument!(arguments, result, command, args, parser_opts_copy)
+        process_regular_argument!(arguments, result, commands_stack, args, parser_opts_copy)
       end
 
       result
@@ -127,13 +140,13 @@ module SimpleScripting
       end
     end
 
-    def process_varargs!(arguments, result, command, args, parser_opts_copy)
+    def process_varargs!(arguments, result, commands_stack, args, parser_opts_copy)
       first_arg_name = args.keys.first.to_s
 
       # Mandatory argument
       if args.fetch(first_arg_name.to_sym)
         if arguments.empty?
-          print_optparse_arguments_help(command, args, parser_opts_copy)
+          print_optparse_arguments_help(commands_stack, args, parser_opts_copy)
         else
           name = args.keys.first[1..-1].to_sym
 
@@ -147,7 +160,7 @@ module SimpleScripting
       end
     end
 
-    def process_regular_argument!(arguments, result, command, args, parser_opts_copy)
+    def process_regular_argument!(arguments, result, commands_stack, args, parser_opts_copy)
       min_args_size = args.count { |_, mandatory| mandatory }
 
       case arguments.size
@@ -156,7 +169,7 @@ module SimpleScripting
           result[name] = value
         end
       else
-        print_optparse_arguments_help(command, args, parser_opts_copy)
+        print_optparse_arguments_help(commands_stack, args, parser_opts_copy)
       end
     end
 
@@ -169,16 +182,16 @@ module SimpleScripting
       raise ExitError
     end
 
-    def print_optparse_arguments_help(command, args, parser_opts_copy)
+    def print_optparse_arguments_help(commands_stack, args, parser_opts_copy)
       parser_opts_help = parser_opts_copy.to_s
 
-      if command
-        parser_opts_help = parser_opts_help.sub!(/(\[options\])/, "#{command} \\1")
+      if commands_stack.size > 0
+        parser_opts_help = parser_opts_help.sub!('[options]', commands_stack.join(' ') + ' [options]')
       end
 
       if args.size > 0
         args_display = args.map { |name, mandatory| mandatory ? "<#{ name }>" : "[<#{ name }>]" }.join(' ')
-        parser_opts_help = parser_opts_help.sub!(/^(Usage: .*)/, "\\1 #{args_display}")
+        parser_opts_help = parser_opts_help.sub!(/^(Usage: .*)/) { |text| "#{text} #{args_display}" }
       end
 
       @output.puts parser_opts_help

@@ -186,12 +186,12 @@ module SimpleScripting
       parser_opts_help = parser_opts_copy.to_s
 
       if commands_stack.size > 0
-        parser_opts_help = parser_opts_help.sub!(/(\[options\])/, commands_stack.join(' ') + " \\1")
+        parser_opts_help = parser_opts_help.sub!('[options]', commands_stack.join(' ') + ' [options]')
       end
 
       if args.size > 0
         args_display = args.map { |name, mandatory| mandatory ? "<#{ name }>" : "[<#{ name }>]" }.join(' ')
-        parser_opts_help = parser_opts_help.sub!(/^(Usage: .*)/, "\\1 #{args_display}")
+        parser_opts_help = parser_opts_help.sub!(/^(Usage: .*)/) { |text| "#{text} #{args_display}" }
       end
 
       @output.puts parser_opts_help

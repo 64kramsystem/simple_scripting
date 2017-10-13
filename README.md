@@ -27,7 +27,7 @@ This is a definition example:
       'schedule',
       '[weeks]',
       long_help: 'This is the long help! It can span multiple lines.'
-    )
+    ) || exit
 
 which:
 
@@ -37,7 +37,7 @@ which:
 - optionally accepts the `weeks` argument,
 - automatically adds the `-h` and `--help` switches,
 - prints all the options and the long help if the help is invoked,
-- prints the help and exits if invalid parameters are passed (eg. too many).
+- exits with a descriptive error if invalid parameters are passed.
 
 This is a sample result:
 

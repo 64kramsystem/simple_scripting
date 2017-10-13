@@ -26,7 +26,7 @@ describe SimpleScripting::Argv do
     it 'should implement the help' do
       decoder_params.last[:arguments] = ['-h']
 
-      described_class.decode(*decoder_params)
+      return_value = described_class.decode(*decoder_params)
 
       expected_output = %Q{\
 Usage: rspec [options] <mandatory> [<optional>]
@@ -42,6 +42,7 @@ This is the long help!
 }
 
       expect(output_buffer.string).to eql(expected_output)
+      expect(return_value).to be(nil)
     end
 
     it "should implement basic switches and arguments (all set)" do

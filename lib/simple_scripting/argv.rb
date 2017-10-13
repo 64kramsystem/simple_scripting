@@ -20,7 +20,7 @@ module SimpleScripting
         decode_arguments!(params_definition, arguments)
       end
     rescue ExitError
-      exit if output == $stdout
+      # return nil, to be used with the 'decode(...) || exit' pattern
     ensure
       # Clean up the instance variables.
       #

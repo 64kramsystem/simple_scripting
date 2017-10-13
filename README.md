@@ -21,7 +21,7 @@ This is a definition example:
 
     require 'simple_scripting/argv'
 
-    result = SimpleOptParse::Argv.decode(
+    result = SimpleScripting::Argv.decode(
       ['-s', '--only-scheduled-days',     'Only print scheduled days'                           ],
       ['-d', '--print-defaults TEMPLATE', 'Print the default activities from the named template'],
       'schedule',

@@ -57,6 +57,21 @@ This is the corresponding help:
 
     This is the long help! It can span multiple lines.
 
+Commands are also supported (with unlimited depth), by using a hash:
+
+    commands, result = SimpleScripting::Argv.decode(
+      'pr' => {
+        'create' => [
+          'title',
+          'description',
+          long_help: 'This is the create PR command help.'
+        ]
+      },
+      'issues' => {
+        'list' => []
+      }
+    ) || exit
+
 For the guide, see the [wiki page](https://github.com/saveriomiroddi/simple_scripting/wiki/SimpleScripting::Argv-Guide).
 
 ## SimpleScripting::Configuration

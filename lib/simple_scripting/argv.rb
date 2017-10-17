@@ -73,7 +73,7 @@ module SimpleScripting
         end
 
         [
-          command,
+          compose_returned_commands(commands_stack),
           decode_arguments!(command_params_definition, arguments, commands_stack),
         ]
       end
@@ -198,6 +198,12 @@ module SimpleScripting
       @output.puts "", @long_help if @long_help
 
       raise ExitError
+    end
+
+    # HELPERS ##############################################
+
+    def compose_returned_commands(commands_stack)
+      commands_stack.join('.')
     end
 
   end

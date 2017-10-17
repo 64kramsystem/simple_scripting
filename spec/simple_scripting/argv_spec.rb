@@ -234,6 +234,26 @@ This is the long help.
         output:     output_buffer
       }}
 
+      it 'should be decoded (two levels)' do
+        decoder_params[:arguments] = ['command1', 'nested1a', 'value1']
+
+        actual_result = described_class.decode(decoder_params)
+
+        expected_result = ['command1.nested1a', arg1: 'value1']
+
+        expect(actual_result).to eql(expected_result)
+      end
+
+      it 'should be decoded (one level)' do
+        decoder_params[:arguments] = ['command2', 'value2']
+
+        actual_result = described_class.decode(decoder_params)
+
+        expected_result = ['command2', arg2: 'value2']
+
+        expect(actual_result).to eql(expected_result)
+      end
+
       it 'should print the command1 help' do
         decoder_params[:arguments] = ['command1', '-h']
 

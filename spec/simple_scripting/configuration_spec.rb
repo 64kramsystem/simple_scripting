@@ -1,6 +1,7 @@
 require_relative '../../lib/simple_scripting/configuration.rb'
 
 require 'tempfile'
+require 'tmpdir'
 
 module SimpleScripting::ConfigurationSpecHelper
 
@@ -50,6 +51,18 @@ g2_key=bang
 
       # Make sure the values are converted recursively
       expect(configuration.group2.g2_key.full_path).to eql(File.expand_path('bang', '~'))
+    end
+  end
+
+  it "should create the configuration file if it doesn't exist" do
+    temp_config_file = File.join(Dir.tmpdir, '.test_simple_scripting_config')
+
+    File.delete(temp_config_file) if File.exists?(temp_config_file)
+
+    begin
+      described_class.load(config_file: temp_config_file)
+    ensure
+      File.delete(temp_config_file)
     end
   end
 

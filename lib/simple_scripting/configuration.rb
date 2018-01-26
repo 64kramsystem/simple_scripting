@@ -1,5 +1,6 @@
 require_relative 'configuration/value'
 
+require 'fileutils'
 require 'ostruct'
 require 'parseconfig'
 
@@ -10,12 +11,18 @@ module SimpleScripting
     extend self
 
     def load(config_file: default_config_file, passwords_key: nil)
+      create_empty_file(config_file) if !File.exists?(config_file)
+
       configuration = ParseConfig.new(config_file)
 
       convert_to_cool_format(OpenStruct.new, configuration.params, passwords_key)
     end
 
     private
+
+    def create_empty_file(file)
+      FileUtils.touch(file)
+    end
 
     def default_config_file
       base_config_filename = '.' + File.basename($PROGRAM_NAME).chomp('.rb')

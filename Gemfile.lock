@@ -1,3 +1,9 @@
+PATH
+  remote: .
+  specs:
+    simple_scripting (0.9.4)
+      parseconfig (~> 1.0)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -40,9 +46,9 @@ PLATFORMS
 
 DEPENDENCIES
   coveralls (~> 0.8.21)
-  parseconfig (~> 1.0)
   rake (~> 12.0)
   rspec (~> 3.6)
+  simple_scripting!
 
 BUNDLED WITH
-   1.11.2
+   1.16.1

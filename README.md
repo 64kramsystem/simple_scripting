@@ -1,6 +1,5 @@
 [![Gem Version][GV img]](https://rubygems.org/gems/simple_scripting)
 [![Build Status][BS img]](https://travis-ci.org/saveriomiroddi/simple_scripting)
-[![Dependency Status][DS img]](https://gemnasium.com/saveriomiroddi/simple_scripting)
 [![Code Climate][CC img]](https://codeclimate.com/github/saveriomiroddi/simple_scripting)
 [![Coverage Status][CS img]](https://coveralls.io/r/saveriomiroddi/simple_scripting)
 
@@ -115,6 +114,5 @@ See the [wiki](https://github.com/saveriomiroddi/simple_scripting/wiki) for addi
 
 [GV img]: https://badge.fury.io/rb/simple_scripting.png
 [BS img]: https://travis-ci.org/saveriomiroddi/simple_scripting.svg?branch=master
-[DS img]: https://gemnasium.com/saveriomiroddi/simple_scripting.png
 [CC img]: https://codeclimate.com/github/saveriomiroddi/simple_scripting.png
 [CS img]: https://coveralls.io/repos/saveriomiroddi/simple_scripting/badge.png?branch=master

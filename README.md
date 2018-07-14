@@ -5,6 +5,8 @@
 
 # SimpleScripting
 
+*The TabCompletion component is under development; please check this project again on (or before) Sat 21/Jul/2018.*
+
 `SS` is a library composed of two modules (`Argv` and `Configuration`) which simplify two common scripting tasks:
 
 - implementing the commandline options parsing (and the related help)

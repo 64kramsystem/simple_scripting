@@ -28,18 +28,18 @@ describe SimpleScripting::Argv do
 
       return_value = described_class.decode(*decoder_params)
 
-      expected_output = %Q{\
-Usage: rspec [options] <mandatory> [<optional>]
-    -a
-    -b                               "-b" description
-    -c, --c-switch
-    -d, --d-switch                   "-d" description
-    -e, --e-switch VALUE
-    -f, --f-switch VALUE             "-f" description
-    -h, --help                       Help
+      expected_output = <<~OUTPUT
+        Usage: rspec [options] <mandatory> [<optional>]
+            -a
+            -b                               "-b" description
+            -c, --c-switch
+            -d, --d-switch                   "-d" description
+            -e, --e-switch VALUE
+            -f, --f-switch VALUE             "-f" description
+            -h, --help                       Help
 
-This is the long help!
-}
+        This is the long help!
+      OUTPUT
 
       expect(output_buffer.string).to eql(expected_output)
       expect(return_value).to be(nil)
@@ -176,11 +176,11 @@ This is the long help!
 
         described_class.decode(decoder_params)
 
-        expected_output = %Q{\
-Invalid command. Valid commands:
+        expected_output = <<~OUTPUT
+          Invalid command. Valid commands:
 
-  command1, command2
-}
+            command1, command2
+        OUTPUT
 
         expect(output_buffer.string).to eql(expected_output)
       end
@@ -190,26 +190,26 @@ Invalid command. Valid commands:
 
         described_class.decode(decoder_params)
 
-        expected_output = %Q{\
-Valid commands:
+        expected_output = <<~OUTPUT
+          Valid commands:
 
-  command1, command2
-}
+            command1, command2
+        OUTPUT
 
         expect(output_buffer.string).to eql(expected_output)
       end
 
       it "should display the command given command's help" do
         decoder_params[:arguments] = ['command1', '-h']
-$a = true
+
         described_class.decode(decoder_params)
 
-        expected_output = %Q{\
-Usage: rspec command1 [options] <arg1>
-    -h, --help                       Help
+        expected_output = <<~OUTPUT
+          Usage: rspec command1 [options] <arg1>
+              -h, --help                       Help
 
-This is the long help.
-}
+          This is the long help.
+        OUTPUT
 
         expect(output_buffer.string).to eql(expected_output)
       end
@@ -259,11 +259,11 @@ This is the long help.
 
         actual_result = described_class.decode(decoder_params)
 
-        expected_output = "\
-Valid commands:
+        expected_output = <<~OUTPUT
+          Valid commands:
 
-  nested1a, nested1b
-"
+            nested1a, nested1b
+        OUTPUT
 
         expect(output_buffer.string).to eql(expected_output)
       end
@@ -273,12 +273,12 @@ Valid commands:
 
         actual_result = described_class.decode(decoder_params)
 
-        expected_output = "\
-Usage: rspec command1 nested1a [options] <arg1>
-    -h, --help                       Help
+        expected_output = <<~OUTPUT
+          Usage: rspec command1 nested1a [options] <arg1>
+              -h, --help                       Help
 
-nested1a long help.
-"
+          nested1a long help.
+        OUTPUT
 
         expect(output_buffer.string).to eql(expected_output)
       end

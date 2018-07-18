@@ -78,22 +78,20 @@ describe SimpleScripting::Argv do
 
     context "error handling" do
 
-      it "should print an error and the help when mandatory arguments are missing" do
+      it "should raise an error when mandatory arguments are missing" do
         decoder_params.last[:arguments] = []
 
-        return_value = described_class.decode(*decoder_params)
+        decoding = -> { described_class.decode(*decoder_params) }
 
-        expect(output_buffer.string).to start_with("Missing mandatory argument(s).\n\nUsage:")
-        expect(return_value).to be(nil)
+        expect(decoding).to raise_error(SimpleScripting::Argv::ArgumentError, "Missing mandatory argument(s)")
       end
 
       it "should print an error and the help when there are too many arguments" do
         decoder_params.last[:arguments] = ['arg1', 'arg2', 'excessive_arg']
 
-        return_value = described_class.decode(*decoder_params)
+        decoding = -> { described_class.decode(*decoder_params) }
 
-        expect(output_buffer.string).to start_with("Too many arguments.\n\nUsage:")
-        expect(return_value).to be(nil)
+        expect(decoding).to raise_error(SimpleScripting::Argv::ArgumentError, "Too many arguments")
       end
 
     end
@@ -126,12 +124,9 @@ describe SimpleScripting::Argv do
         it "should exit when they are not specified" do
           decoder_params.last[:arguments] = []
 
-          actual_result = described_class.decode(*decoder_params)
+          decoding = -> { described_class.decode(*decoder_params) }
 
-          expected_result = nil
-
-          expect(actual_result).to eql(expected_result)
-          expect(output_buffer.string).to start_with("Missing mandatory argument(s).\n\nUsage:")
+          expect(decoding).to raise_error(SimpleScripting::Argv::ArgumentError, "Missing mandatory argument(s)")
         end
 
       end
@@ -198,18 +193,16 @@ describe SimpleScripting::Argv do
         expect(actual_result).to eql(expected_result)
       end
 
-      it 'print a message on wrong command' do
-        decoder_params[:arguments] = ['pizza']
+      context "error handling" do
 
-        described_class.decode(decoder_params)
+        it "should raise an error on invalid command" do
+          decoder_params[:arguments] = ['pizza']
 
-        expected_output = <<~OUTPUT
-          Invalid command. Valid commands:
+          decoding = -> { described_class.decode(decoder_params) }
 
-            command1, command2
-        OUTPUT
+          expect(decoding).to raise_error(SimpleScripting::Argv::InvalidCommand, "Invalid command: pizza")
+        end
 
-        expect(output_buffer.string).to eql(expected_output)
       end
 
       it 'should implement the commands help' do
@@ -311,22 +304,24 @@ describe SimpleScripting::Argv do
       end
     end
 
-    describe 'No argv case' do
+  end # describe 'Commands'
 
-      let(:decoder_params) {{
-        output:     output_buffer,
-      }}
+  # Special case.
+  #
+  describe 'No definitions given' do
 
-      it 'should avoided options being interpreted as definitions' do
-        decoder_params[:arguments] = ['pizza']
+    let(:decoder_params) {{
+      output:     output_buffer,
+    }}
 
-        actual_result = described_class.decode(decoder_params)
+    it 'should avoid options being interpreted as definitions' do
+      decoder_params[:arguments] = ['pizza']
 
-        expect(actual_result).to be(nil)
-      end
+      decoding = -> { described_class.decode(decoder_params) }
 
+      expect(decoding).to raise_error(SimpleScripting::Argv::ArgumentError, "Too many arguments")
     end
 
-  end
+  end # describe 'No definitions given'
 
 end

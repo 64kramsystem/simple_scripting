@@ -4,22 +4,21 @@ module SimpleScripting
 
   module Argv
 
-    # Currently, due to exception handling and message printing being treated the same, there is
-    # ambiguity in the following classes being an exception or just a transport class. This will
-    # we clarified once the automatic help is made optional.
+    # The fact that the following errors don't descend from OptionParser::InvalidOption is somewhat
+    # annoying, however, there should be no practical problem.
     #
-    class ExitOnCommand < Struct.new(:commands_definition, :error_message)
+    class InvalidCommand < StandardError; end
+    class ArgumentError < StandardError; end
+
+    class ExitWithCommandsHelpPrinting < Struct.new(:commands_definition)
       # Note that :long_help is not used.
       def print_help(output, long_help)
-        output.print "#{error_message}. " if error_message
         output.puts "Valid commands:", "", "  " + commands_definition.keys.join(', ')
       end
     end
 
-    class ExitOnArguments < Struct.new(:commands_stack, :args, :parser_opts_copy, :error_message)
+    class ExitWithArgumentsHelpPrinting < Struct.new(:commands_stack, :args, :parser_opts_copy)
       def print_help(output, long_help)
-        output.puts "#{error_message}.", "" if error_message
-
         parser_opts_help = parser_opts_copy.to_s
 
         if commands_stack.size > 0
@@ -75,7 +74,7 @@ module SimpleScripting
       command_for_check = arguments.shift
 
       if command_for_check == '-h' || command_for_check == '--help'
-        throw :exit, ExitOnCommand.new(commands_definition)
+        throw :exit, ExitWithCommandsHelpPrinting.new(commands_definition)
       end
 
       command = command_for_check
@@ -83,7 +82,7 @@ module SimpleScripting
 
       case command_params_definition
       when nil
-        throw :exit, ExitOnCommand.new(commands_definition, "Invalid command")
+        raise InvalidCommand.new("Invalid command: #{command}")
       when Hash
         commands_stack << command
 
@@ -126,7 +125,7 @@ module SimpleScripting
         end
 
         parser_opts.on('-h', '--help', 'Help') do
-          throw :exit, ExitOnArguments.new(commands_stack, args, parser_opts_copy)
+          throw :exit, ExitWithArgumentsHelpPrinting.new(commands_stack, args, parser_opts_copy)
         end
 
         parser_opts_copy = parser_opts
@@ -175,7 +174,7 @@ module SimpleScripting
       # Mandatory argument
       if args.fetch(first_arg_name.to_sym)
         if arguments.empty?
-          throw :exit, ExitOnArguments.new(commands_stack, args, parser_opts_copy, "Missing mandatory argument(s)")
+          raise ArgumentError.new("Missing mandatory argument(s)")
         else
           name = args.keys.first[1..-1].to_sym
 
@@ -193,9 +192,9 @@ module SimpleScripting
       min_args_size = args.count { |_, mandatory| mandatory }
 
       if arguments.size < min_args_size
-        throw :exit, ExitOnArguments.new(commands_stack, args, parser_opts_copy, "Missing mandatory argument(s)")
+        raise ArgumentError.new("Missing mandatory argument(s)")
       elsif arguments.size > args.size
-        throw :exit, ExitOnArguments.new(commands_stack, args, parser_opts_copy, "Too many arguments")
+        raise ArgumentError.new("Too many arguments")
       else
         arguments.zip(args) do |value, (name, _)|
           result[name] = value

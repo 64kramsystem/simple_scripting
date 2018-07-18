@@ -16,8 +16,10 @@ module SimpleScripting
       end
     end
 
-    class ExitOnArguments < Struct.new(:commands_stack, :args, :parser_opts_copy)
+    class ExitOnArguments < Struct.new(:commands_stack, :args, :parser_opts_copy, :error_message)
       def print_help(output, long_help)
+        output.puts "#{error_message}.", "" if error_message
+
         parser_opts_help = parser_opts_copy.to_s
 
         if commands_stack.size > 0
@@ -173,7 +175,7 @@ module SimpleScripting
       # Mandatory argument
       if args.fetch(first_arg_name.to_sym)
         if arguments.empty?
-          throw :exit, ExitOnArguments.new(commands_stack, args, parser_opts_copy)
+          throw :exit, ExitOnArguments.new(commands_stack, args, parser_opts_copy, "Missing mandatory argument(s)")
         else
           name = args.keys.first[1..-1].to_sym
 
@@ -190,13 +192,14 @@ module SimpleScripting
     def process_regular_argument!(arguments, result, commands_stack, args, parser_opts_copy)
       min_args_size = args.count { |_, mandatory| mandatory }
 
-      case arguments.size
-      when (min_args_size .. args.size)
+      if arguments.size < min_args_size
+        throw :exit, ExitOnArguments.new(commands_stack, args, parser_opts_copy, "Missing mandatory argument(s)")
+      elsif arguments.size > args.size
+        throw :exit, ExitOnArguments.new(commands_stack, args, parser_opts_copy, "Too many arguments")
+      else
         arguments.zip(args) do |value, (name, _)|
           result[name] = value
         end
-      else
-        throw :exit, ExitOnArguments.new(commands_stack, args, parser_opts_copy)
       end
     end
 

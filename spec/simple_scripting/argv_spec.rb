@@ -76,6 +76,28 @@ describe SimpleScripting::Argv do
       expect(actual_result).to eql(expected_result)
     end
 
+    context "error handling" do
+
+      it "should print an error and the help when mandatory arguments are missing" do
+        decoder_params.last[:arguments] = []
+
+        return_value = described_class.decode(*decoder_params)
+
+        expect(output_buffer.string).to start_with("Missing mandatory argument(s).\n\nUsage:")
+        expect(return_value).to be(nil)
+      end
+
+      it "should print an error and the help when there are too many arguments" do
+        decoder_params.last[:arguments] = ['arg1', 'arg2', 'excessive_arg']
+
+        return_value = described_class.decode(*decoder_params)
+
+        expect(output_buffer.string).to start_with("Too many arguments.\n\nUsage:")
+        expect(return_value).to be(nil)
+      end
+
+    end
+
   end
 
   describe 'Varargs' do
@@ -99,14 +121,19 @@ describe SimpleScripting::Argv do
         expect(actual_result).to eql(expected_result)
       end
 
-      it "should exit when they are not specified" do
-        decoder_params.last[:arguments] = []
+      context "error handling" do
 
-        actual_result = described_class.decode(*decoder_params)
+        it "should exit when they are not specified" do
+          decoder_params.last[:arguments] = []
 
-        expected_result = nil
+          actual_result = described_class.decode(*decoder_params)
 
-        expect(actual_result).to eql(expected_result)
+          expected_result = nil
+
+          expect(actual_result).to eql(expected_result)
+          expect(output_buffer.string).to start_with("Missing mandatory argument(s).\n\nUsage:")
+        end
+
       end
 
     end

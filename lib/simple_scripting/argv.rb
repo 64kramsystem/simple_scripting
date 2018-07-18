@@ -37,16 +37,16 @@ module SimpleScripting
 
     extend self
 
-    def decode(*params_definition, arguments: ARGV, long_help: nil, output: $stdout)
+    def decode(*params_definition, arguments: ARGV, long_help: nil, auto_help: true, output: $stdout)
       # WATCH OUT! @long_help can also be set in :decode_command!. See issue #17.
       #
       @long_help = long_help
 
       exit_data = catch(:exit) do
         if params_definition.first.is_a?(Hash)
-          return decode_command!(params_definition, arguments)
+          return decode_command!(params_definition, arguments, auto_help)
         else
-          return decode_arguments!(params_definition, arguments)
+          return decode_arguments!(params_definition, arguments, auto_help)
         end
       end
 
@@ -65,7 +65,7 @@ module SimpleScripting
     #
     #   [{"command1"=>["arg1", {:long_help=>"This is the long help."}], "command2"=>["arg2"]}]
     #
-    def decode_command!(params_definition, arguments, commands_stack=[])
+    def decode_command!(params_definition, arguments, auto_help, commands_stack=[])
       commands_definition = params_definition.first
 
       # Set the `command` variable only after; in the case where we print the help, this variable
@@ -73,8 +73,19 @@ module SimpleScripting
       #
       command_for_check = arguments.shift
 
+      # Note that `--help` is baked into OptParse, so without a workaround, we need to always include
+      # it.
+      #
       if command_for_check == '-h' || command_for_check == '--help'
-        throw :exit, ExitWithCommandsHelpPrinting.new(commands_definition)
+        if auto_help
+          throw :exit, ExitWithCommandsHelpPrinting.new(commands_definition)
+        else
+          # This is tricky. Since the common behavior of `--help` is to trigger an unconditional
+          # help, it's not clear what to do with other tokens. For simplicity, we just return
+          # this flag.
+          #
+          return { help: true }
+        end
       end
 
       command = command_for_check
@@ -88,7 +99,7 @@ module SimpleScripting
 
         # Nested case! Decode recursively
         #
-        decode_command!([command_params_definition], arguments, commands_stack)
+        decode_command!([command_params_definition], arguments, auto_help, commands_stack)
       else
         commands_stack << command
 
@@ -99,12 +110,12 @@ module SimpleScripting
 
         [
           compose_returned_commands(commands_stack),
-          decode_arguments!(command_params_definition, arguments, commands_stack),
+          decode_arguments!(command_params_definition, arguments, auto_help, commands_stack),
         ]
       end
     end
 
-    def decode_arguments!(params_definition, arguments, commands_stack=[])
+    def decode_arguments!(params_definition, arguments, auto_help, commands_stack=[])
       result           = {}
       parser_opts_copy = nil  # not available outside the block
       args             = {}   # { 'name' => mandatory? }
@@ -124,8 +135,17 @@ module SimpleScripting
           end
         end
 
+        # See --help note in :decode_command!.
+        #
         parser_opts.on('-h', '--help', 'Help') do
-          throw :exit, ExitWithArgumentsHelpPrinting.new(commands_stack, args, parser_opts_copy)
+          if auto_help
+            throw :exit, ExitWithArgumentsHelpPrinting.new(commands_stack, args, parser_opts_copy)
+          else
+            # Needs to be better handled. When help is required, generally, it trumps the
+            # correctness of the rest of the options/arguments.
+            #
+            result[:help] = true
+          end
         end
 
         parser_opts_copy = parser_opts

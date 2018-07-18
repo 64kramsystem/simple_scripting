@@ -23,27 +23,59 @@ describe SimpleScripting::Argv do
       output:     output_buffer,
     ]}
 
-    it 'should implement the help' do
-      decoder_params.last[:arguments] = ['-h']
+    context 'help' do
 
-      return_value = described_class.decode(*decoder_params)
+      it 'should print help automatically by default' do
+        decoder_params.last[:arguments] = ['-h']
 
-      expected_output = <<~OUTPUT
-        Usage: rspec [options] <mandatory> [<optional>]
-            -a
-            -b                               "-b" description
-            -c, --c-switch
-            -d, --d-switch                   "-d" description
-            -e, --e-switch VALUE
-            -f, --f-switch VALUE             "-f" description
-            -h, --help                       Help
+        return_value = described_class.decode(*decoder_params)
 
-        This is the long help!
-      OUTPUT
+        expected_output = <<~OUTPUT
+          Usage: rspec [options] <mandatory> [<optional>]
+              -a
+              -b                               "-b" description
+              -c, --c-switch
+              -d, --d-switch                   "-d" description
+              -e, --e-switch VALUE
+              -f, --f-switch VALUE             "-f" description
+              -h, --help                       Help
 
-      expect(output_buffer.string).to eql(expected_output)
-      expect(return_value).to be(nil)
-    end
+          This is the long help!
+        OUTPUT
+
+        expect(output_buffer.string).to eql(expected_output)
+        expect(return_value).to be(nil)
+      end
+
+      it 'should not interpret the --help argument, and not print the help, on auto_help: false' do
+        decoder_params.last.merge!(
+          arguments: ['--help', 'm_arg'],
+          auto_help: false
+        )
+
+        actual_result = described_class.decode(*decoder_params)
+
+        expected_result = {
+          help: true,
+          mandatory: 'm_arg',
+        }
+
+        expect(output_buffer.string).to eql('')
+        expect(actual_result).to eql(expected_result)
+      end
+
+      it "should check all the options/arguments when --help is passed, raising an error when they're not correct" do
+        decoder_params.last.merge!(
+          arguments: ['--help'],
+          auto_help: false
+        )
+
+        decoding = -> { described_class.decode(*decoder_params) }
+
+        expect(decoding).to raise_error(SimpleScripting::Argv::ArgumentError, "Missing mandatory argument(s)")
+      end
+
+    end # context 'help'
 
     it "should implement basic switches and arguments (all set)" do
       decoder_params.last[:arguments] = ['-a', '-b', '-c', '-d', '-ev_swt', '-fv_swt', 'm_arg', 'o_arg']
@@ -205,34 +237,72 @@ describe SimpleScripting::Argv do
 
       end
 
-      it 'should implement the commands help' do
-        decoder_params[:arguments] = ['-h']
+      context "help" do
 
-        described_class.decode(decoder_params)
+        it 'should implement the commands help' do
+          decoder_params[:arguments] = ['-h']
 
-        expected_output = <<~OUTPUT
-          Valid commands:
+          described_class.decode(decoder_params)
 
-            command1, command2
-        OUTPUT
+          expected_output = <<~OUTPUT
+            Valid commands:
 
-        expect(output_buffer.string).to eql(expected_output)
-      end
+              command1, command2
+          OUTPUT
 
-      it "should display the command given command's help" do
-        decoder_params[:arguments] = ['command1', '-h']
+          expect(output_buffer.string).to eql(expected_output)
+        end
 
-        described_class.decode(decoder_params)
+        it "should display the command given command's help" do
+          decoder_params[:arguments] = ['command1', '-h']
 
-        expected_output = <<~OUTPUT
-          Usage: rspec command1 [options] <arg1>
-              -h, --help                       Help
+          described_class.decode(decoder_params)
 
-          This is the long help.
-        OUTPUT
+          expected_output = <<~OUTPUT
+            Usage: rspec command1 [options] <arg1>
+                -h, --help                       Help
 
-        expect(output_buffer.string).to eql(expected_output)
-      end
+            This is the long help.
+          OUTPUT
+
+          expect(output_buffer.string).to eql(expected_output)
+        end
+
+        context 'auto_help: false' do
+
+          it 'should not interpret the --help argument, and not print the help' do
+            decoder_params.merge!(
+              arguments: ['-h'],
+              auto_help: false,
+            )
+
+            actual_result = described_class.decode(decoder_params)
+
+            expected_result = {
+              help: true,
+            }
+
+            expect(actual_result).to eql(expected_result)
+          end
+
+          it 'should ignore and not return all the other arguments' do
+            decoder_params.merge!(
+              arguments: ['-h', 'pizza'],
+              auto_help: false,
+            )
+
+            actual_result = described_class.decode(decoder_params)
+
+            expected_result = {
+              help: true,
+            }
+
+            expect(actual_result).to eql(expected_result)
+          end
+
+        end # context 'auto_help: false'
+
+      end # context 'help'
 
     end
 

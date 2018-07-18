@@ -4,7 +4,36 @@ module SimpleScripting
 
   module Argv
 
-    class ExitError < StandardError; end
+    # The fact that the following errors don't descend from OptionParser::InvalidOption is somewhat
+    # annoying, however, there should be no practical problem.
+    #
+    class InvalidCommand < StandardError; end
+    class ArgumentError < StandardError; end
+
+    class ExitWithCommandsHelpPrinting < Struct.new(:commands_definition)
+      # Note that :long_help is not used.
+      def print_help(output, long_help)
+        output.puts "Valid commands:", "", "  " + commands_definition.keys.join(', ')
+      end
+    end
+
+    class ExitWithArgumentsHelpPrinting < Struct.new(:commands_stack, :args, :parser_opts_copy)
+      def print_help(output, long_help)
+        parser_opts_help = parser_opts_copy.to_s
+
+        if commands_stack.size > 0
+          parser_opts_help = parser_opts_help.sub!('[options]', commands_stack.join(' ') + ' [options]')
+        end
+
+        if args.size > 0
+          args_display = args.map { |name, mandatory| mandatory ? "<#{ name }>" : "[<#{ name }>]" }.join(' ')
+          parser_opts_help = parser_opts_help.sub!(/^(Usage: .*)/) { |text| "#{text} #{args_display}" }
+        end
+
+        output.puts parser_opts_help
+        output.puts "", long_help if long_help
+      end
+    end
 
     extend self
 
@@ -12,24 +41,20 @@ module SimpleScripting
       # WATCH OUT! @long_help can also be set in :decode_command!. See issue #17.
       #
       @long_help = long_help
-      @output = output
 
-      if params_definition.first.is_a?(Hash)
-        decode_command!(params_definition, arguments)
-      else
-        decode_arguments!(params_definition, arguments)
+      exit_data = catch(:exit) do
+        if params_definition.first.is_a?(Hash)
+          return decode_command!(params_definition, arguments)
+        else
+          return decode_arguments!(params_definition, arguments)
+        end
       end
-    rescue ExitError
-      # return nil, to be used with the 'decode(...) || exit' pattern
-    ensure
-      # Clean up the instance variables.
-      #
-      # There is a balance to strike between instance variables, and local variables
-      # passed around. One of the options, which is this case, is to set and instance
-      # variables only these two, which are constant.
 
+      exit_data.print_help(output, @long_help)
+
+      nil # to be used with the 'decode(...) || exit' pattern
+    ensure
       @long_help = nil
-      @output = nil
     end
 
     private
@@ -49,7 +74,7 @@ module SimpleScripting
       command_for_check = arguments.shift
 
       if command_for_check == '-h' || command_for_check == '--help'
-        print_optparse_commands_help(nil, commands_definition)
+        throw :exit, ExitWithCommandsHelpPrinting.new(commands_definition)
       end
 
       command = command_for_check
@@ -57,7 +82,7 @@ module SimpleScripting
 
       case command_params_definition
       when nil
-        print_optparse_commands_help(command, commands_definition)
+        raise InvalidCommand.new("Invalid command: #{command}")
       when Hash
         commands_stack << command
 
@@ -92,12 +117,15 @@ module SimpleScripting
           when String
             process_argument_definition!(param_definition, args)
           else
+            # This is an error in the params definition, so it doesn't follow the user error/help
+            # workflow.
+            #
             raise "Unrecognized value: #{param_definition}"
           end
         end
 
         parser_opts.on('-h', '--help', 'Help') do
-          print_optparse_arguments_help(commands_stack, args, parser_opts_copy)
+          throw :exit, ExitWithArgumentsHelpPrinting.new(commands_stack, args, parser_opts_copy)
         end
 
         parser_opts_copy = parser_opts
@@ -146,7 +174,7 @@ module SimpleScripting
       # Mandatory argument
       if args.fetch(first_arg_name.to_sym)
         if arguments.empty?
-          print_optparse_arguments_help(commands_stack, args, parser_opts_copy)
+          raise ArgumentError.new("Missing mandatory argument(s)")
         else
           name = args.keys.first[1..-1].to_sym
 
@@ -163,41 +191,15 @@ module SimpleScripting
     def process_regular_argument!(arguments, result, commands_stack, args, parser_opts_copy)
       min_args_size = args.count { |_, mandatory| mandatory }
 
-      case arguments.size
-      when (min_args_size .. args.size)
+      if arguments.size < min_args_size
+        raise ArgumentError.new("Missing mandatory argument(s)")
+      elsif arguments.size > args.size
+        raise ArgumentError.new("Too many arguments")
+      else
         arguments.zip(args) do |value, (name, _)|
           result[name] = value
         end
-      else
-        print_optparse_arguments_help(commands_stack, args, parser_opts_copy)
       end
-    end
-
-    # HELP #################################################
-
-    def print_optparse_commands_help(command, commands_definition)
-      @output.print "Invalid command. " if command
-      @output.puts "Valid commands:", "", "  " + commands_definition.keys.join(', ')
-
-      raise ExitError
-    end
-
-    def print_optparse_arguments_help(commands_stack, args, parser_opts_copy)
-      parser_opts_help = parser_opts_copy.to_s
-
-      if commands_stack.size > 0
-        parser_opts_help = parser_opts_help.sub!('[options]', commands_stack.join(' ') + ' [options]')
-      end
-
-      if args.size > 0
-        args_display = args.map { |name, mandatory| mandatory ? "<#{ name }>" : "[<#{ name }>]" }.join(' ')
-        parser_opts_help = parser_opts_help.sub!(/^(Usage: .*)/) { |text| "#{text} #{args_display}" }
-      end
-
-      @output.puts parser_opts_help
-      @output.puts "", @long_help if @long_help
-
-      raise ExitError
     end
 
     # HELPERS ##############################################

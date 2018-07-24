@@ -126,9 +126,9 @@ describe SimpleScripting::Argv do
         expect(decoding).to raise_error(SimpleScripting::Argv::ArgumentError, "Too many arguments")
       end
 
-    end
+    end # context "error handling"
 
-  end
+  end # describe 'Basic functionality'
 
   describe 'Varargs' do
 
@@ -161,9 +161,9 @@ describe SimpleScripting::Argv do
           expect(decoding).to raise_error(SimpleScripting::Argv::ArgumentError, "Missing mandatory argument(s)")
         end
 
-      end
+      end # context "error handling"
 
-    end
+    end # describe '(mandatory)'
 
     describe '(optional)' do
 
@@ -196,9 +196,9 @@ describe SimpleScripting::Argv do
         expect(actual_result).to eql(expected_result)
       end
 
-    end
+    end # describe '(optional)'
 
-  end
+  end # describe 'Varargs'
 
   describe 'Commands' do
 
@@ -235,7 +235,7 @@ describe SimpleScripting::Argv do
           expect(decoding).to raise_error(SimpleScripting::Argv::InvalidCommand, "Invalid command: pizza")
         end
 
-      end
+      end # context "error handling"
 
       context "help" do
 
@@ -304,7 +304,7 @@ describe SimpleScripting::Argv do
 
       end # context 'help'
 
-    end
+    end # describe 'regular case'
 
     describe 'Nested commands' do
 
@@ -372,7 +372,7 @@ describe SimpleScripting::Argv do
 
         expect(output_buffer.string).to eql(expected_output)
       end
-    end
+    end # describe 'Nested commands'
 
   end # describe 'Commands'
 

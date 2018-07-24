@@ -108,6 +108,41 @@ describe SimpleScripting::Argv do
       expect(actual_result).to eql(expected_result)
     end
 
+    context "multiple optional arguments" do
+
+      let(:decoder_params) {[
+        '[optional1]',
+        '[optional2]',
+        output:     output_buffer,
+      ]}
+
+      it "should correctly decode a single argument passed" do
+        decoder_params.last[:arguments] = ['o_arg1']
+
+        actual_result = described_class.decode(*decoder_params)
+
+        expected_result = {
+          optional1: 'o_arg1',
+        }
+
+        expect(actual_result).to eql(expected_result)
+      end
+
+      it "should correctly decode all arguments passed" do
+        decoder_params.last[:arguments] = ['o_arg1', 'o_arg2']
+
+        actual_result = described_class.decode(*decoder_params)
+
+        expected_result = {
+          optional1: 'o_arg1',
+          optional2: 'o_arg2',
+        }
+
+        expect(actual_result).to eql(expected_result)
+      end
+
+    end
+
     context "error handling" do
 
       it "should raise an error when mandatory arguments are missing" do

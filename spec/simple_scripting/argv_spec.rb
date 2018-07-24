@@ -108,6 +108,41 @@ describe SimpleScripting::Argv do
       expect(actual_result).to eql(expected_result)
     end
 
+    context "multiple optional arguments" do
+
+      let(:decoder_params) {[
+        '[optional1]',
+        '[optional2]',
+        output:     output_buffer,
+      ]}
+
+      it "should correctly decode a single argument passed" do
+        decoder_params.last[:arguments] = ['o_arg1']
+
+        actual_result = described_class.decode(*decoder_params)
+
+        expected_result = {
+          optional1: 'o_arg1',
+        }
+
+        expect(actual_result).to eql(expected_result)
+      end
+
+      it "should correctly decode all arguments passed" do
+        decoder_params.last[:arguments] = ['o_arg1', 'o_arg2']
+
+        actual_result = described_class.decode(*decoder_params)
+
+        expected_result = {
+          optional1: 'o_arg1',
+          optional2: 'o_arg2',
+        }
+
+        expect(actual_result).to eql(expected_result)
+      end
+
+    end
+
     context "error handling" do
 
       it "should raise an error when mandatory arguments are missing" do
@@ -126,9 +161,9 @@ describe SimpleScripting::Argv do
         expect(decoding).to raise_error(SimpleScripting::Argv::ArgumentError, "Too many arguments")
       end
 
-    end
+    end # context "error handling"
 
-  end
+  end # describe 'Basic functionality'
 
   describe 'Varargs' do
 
@@ -161,9 +196,9 @@ describe SimpleScripting::Argv do
           expect(decoding).to raise_error(SimpleScripting::Argv::ArgumentError, "Missing mandatory argument(s)")
         end
 
-      end
+      end # context "error handling"
 
-    end
+    end # describe '(mandatory)'
 
     describe '(optional)' do
 
@@ -196,9 +231,9 @@ describe SimpleScripting::Argv do
         expect(actual_result).to eql(expected_result)
       end
 
-    end
+    end # describe '(optional)'
 
-  end
+  end # describe 'Varargs'
 
   describe 'Commands' do
 
@@ -235,7 +270,7 @@ describe SimpleScripting::Argv do
           expect(decoding).to raise_error(SimpleScripting::Argv::InvalidCommand, "Invalid command: pizza")
         end
 
-      end
+      end # context "error handling"
 
       context "help" do
 
@@ -304,7 +339,7 @@ describe SimpleScripting::Argv do
 
       end # context 'help'
 
-    end
+    end # describe 'regular case'
 
     describe 'Nested commands' do
 
@@ -372,7 +407,7 @@ describe SimpleScripting::Argv do
 
         expect(output_buffer.string).to eql(expected_output)
       end
-    end
+    end # describe 'Nested commands'
 
   end # describe 'Commands'
 

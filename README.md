@@ -5,14 +5,85 @@
 
 # SimpleScripting
 
-*The TabCompletion component is under development; please check this project again on (or before) Sat 21/Jul/2018.*
+`SS` is a library composed of three modules (`TabCompletion`, `Argv` and `Configuration`) which simplify three common scripting tasks:
 
-`SS` is a library composed of two modules (`Argv` and `Configuration`) which simplify two common scripting tasks:
-
+- writing autocompletion scripts
 - implementing the commandline options parsing (and the related help)
 - loading and decoding the configuration for the script/application
 
 `SS` is an interesting (and useful) exercise in design, aimed at finding the simplest and most expressive data/structures which accomplish the given task(s). For this reason, the library can be useful for people who frequently write small scripts (eg. devops or nerds).
+
+## SimpleScripting::TabCompletion
+
+`TabCompletion` makes trivial to define tab-completion for terminal commands on Linux/Mac systems; it's so easy that an example is much simpler than an explanation.
+
+### Example
+
+Suppose we have the command:
+
+```sh
+open_project [-e|--with-editor EDITOR] <project_name>
+```
+
+We want to add tab completion both for the option and the project name. Easy!!
+
+Install the gem (`simple_scripting`), then create this class (`/my/completion_scripts/open_project_completion.rb`):
+
+```ruby
+#!/usr/bin/env ruby
+
+require 'simple_scripting/tab_completion'
+
+class OpenProjectTabCompletion
+  SYSTEM_EDITORS = `update-alternatives --list editor`.split("\n").map { |filename| File.basename(filename) }
+
+  def with_editor(prefix, suffix, context)
+    SYSTEM_EDITORS.grep /^#{prefix}/
+  end
+
+  def project_name(prefix, suffix, context)
+    Dir["/my/home/my_projects/#{prefix}*"]
+  end
+end
+
+if __FILE__ == $PROGRAM_NAME
+  completion_definition = [
+    ["-e", "--with-editor EDITOR"],
+    'project_name'
+  ]
+
+  SimpleScripting::TabCompletion.new(completion_definition).complete(OpenProjectTabCompletion.new)
+end
+```
+
+then chmod and register it:
+
+```sh
+$ chmod +x /my/completion_scripts/open_project_completion.rb
+$ complete -C /my/completion_scripts/open_project_completion.rb -o default open_project
+```
+
+Done!
+
+Now type the following, and get:
+
+```sh
+$ open_project g<tab>           # lists: "geet", "gitlab-ce", "gnome-terminal"
+$ open_project --with-editor v  # lists: "vim.basic", "vim.tiny"
+$ open_project --wi<tab>        # autocompletes "--with-editor"; this is built-in!
+```
+
+Happy completion!
+
+### Supported shells
+
+TabCompletion supports Bash, and Zsh with bashcompinit.
+
+Note that a recent version of Zsh is required - the Ubuntu 16.04 standard version has a bug that breaks bash-compatible completion.
+
+### More complex use cases
+
+For a description of the more complex use cases, including edge cases and error handling, see the [wiki](https://github.com/saveriomiroddi/simple_scripting/wiki/SimpleScripting::TabCompletion-Guide).
 
 ## SimpleScripting::Argv
 

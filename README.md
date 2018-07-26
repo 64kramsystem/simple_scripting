@@ -5,13 +5,13 @@
 
 # SimpleScripting
 
-`SS` is a library composed of three modules (`TabCompletion`, `Argv` and `Configuration`) which simplify three common scripting tasks:
+`SimpleScripting` is a library composed of three modules (`TabCompletion`, `Argv` and `Configuration`) that simplify three common scripting tasks:
 
 - writing autocompletion scripts
 - implementing the commandline options parsing (and the related help)
 - loading and decoding the configuration for the script/application
 
-`SS` is an interesting (and useful) exercise in design, aimed at finding the simplest and most expressive data/structures which accomplish the given task(s). For this reason, the library can be useful for people who frequently write small scripts (eg. devops or nerds).
+`SimpleScripting` is an interesting (and useful) exercise in design, aimed at finding the simplest and most expressive data/structures that accomplish the given task(s). For this reason, the library can be useful for people who frequently write small scripts (eg. devops or nerds).
 
 ## SimpleScripting::TabCompletion
 
@@ -87,7 +87,7 @@ For a description of the more complex use cases, including edge cases and error 
 
 ## SimpleScripting::Argv
 
-`SS::A` is a module which acts as frontend to the standard Option Parser library (`optparse`), giving a very convenient format for specifying the arguments. `SS::A` also generates the help.
+`Argv` is a module which acts as frontend to the standard Option Parser library (`optparse`), giving a very convenient format for specifying the arguments. `Argv` also generates the help.
 
 This is a definition example:
 
@@ -148,7 +148,7 @@ For the guide, see the [wiki page](https://github.com/saveriomiroddi/simple_scri
 
 ## SimpleScripting::Configuration
 
-`SS::C` is a module which acts as frontend to the ParseConfig gem (`parseconfig`), giving compact access to the configuration and its values, and adding a few helpers for common tasks.
+`Configuration` is a module which acts as frontend to the ParseConfig gem (`parseconfig`), giving compact access to the configuration and its values, and adding a few helpers for common tasks.
 
 Say one writes a script (`foo_my_bar.rb`), with a corresponding (`$HOME/.foo_my_bar`) configuration, which contains:
 
@@ -160,7 +160,7 @@ Say one writes a script (`foo_my_bar.rb`), with a corresponding (`$HOME/.foo_my_
     [a_group]
     group_key=baz
 
-This is the workflow and functionality offered by `SS::C`:
+This is the workflow and functionality offered by `Configuration`:
 
     require 'simple_scripting/configuration'
 

@@ -17,6 +17,8 @@
 
 `TabCompletion` makes trivial to define tab-completion for terminal commands on Linux/Mac systems; it's so easy that an example is much simpler than an explanation.
 
+`TabCompletion` supports Bash, and Zsh (with `bashcompinit`).
+
 ### Example
 
 Suppose we have the command:
@@ -75,11 +77,16 @@ $ open_project --wi<tab>        # autocompletes "--with-editor"; this is built-i
 
 Happy completion!
 
-### Supported shells
+### Zsh
 
-TabCompletion supports Bash, and Zsh with bashcompinit.
+`TabCompletion` on Zsh requires `bashcompinit`; add the following to your `~/.zshrc`:
 
-Note that a recent version of Zsh is required - the Ubuntu 16.04 standard version has a bug that breaks bash-compatible completion.
+```sh
+autoload bashcompinit
+bashcompinit
+```
+
+Note that a **recent version of Zsh is required**; the stock Ubuntu 16.04 version (5.1.1-1ubuntu2.2) has bug that breaks bash tab completion.
 
 ### More complex use cases
 

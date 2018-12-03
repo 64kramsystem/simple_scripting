@@ -89,6 +89,9 @@ module SimpleScripting
       end
 
       command = command_for_check
+
+      raise InvalidCommand.new("Missing command") if command.nil?
+
       command_params_definition = commands_definition[command]
 
       case command_params_definition

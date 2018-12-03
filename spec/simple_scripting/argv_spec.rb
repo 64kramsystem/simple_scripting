@@ -270,6 +270,14 @@ describe SimpleScripting::Argv do
           expect(decoding).to raise_error(SimpleScripting::Argv::InvalidCommand, "Invalid command: pizza")
         end
 
+        it "should print a specific error message on missing command" do
+          decoder_params[:arguments] = []
+
+          decoding = -> { described_class.decode(decoder_params) }
+
+          expect(decoding).to raise_error(SimpleScripting::Argv::InvalidCommand, "Missing command")
+        end
+
       end # context "error handling"
 
       context "help" do

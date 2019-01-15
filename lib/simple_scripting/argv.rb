@@ -37,7 +37,14 @@ module SimpleScripting
 
     extend self
 
-    def decode(*params_definition, arguments: ARGV, long_help: nil, auto_help: true, output: $stdout)
+    def decode(*definition_and_options)
+      params_definition, options = decode_definition_and_options(definition_and_options)
+
+      arguments = options.fetch(:arguments, ARGV)
+      long_help = options[:long_help]
+      auto_help = options.fetch(:auto_help, true)
+      output    = options.fetch(:output, $stdout)
+
       # WATCH OUT! @long_help can also be set in :decode_command!. See issue #17.
       #
       @long_help = long_help
@@ -58,6 +65,31 @@ module SimpleScripting
     end
 
     private
+
+    # This is trivial to define with named arguments, however, Ruby 2.6 removed the support for
+    # mixing strings and symbols as argument keys, so we're forced to perform manual decoding.
+    # The complexity of this code supports the rationale for the removal of the functionality.
+    #
+    def decode_definition_and_options(definition_and_options)
+      # Only a hash (commands)
+      if definition_and_options.size == 1 && definition_and_options.first.is_a?(Hash)
+        options = definition_and_options.first.each_with_object({}) do |(key, value), current_options|
+          current_options[key] = definition_and_options.first.delete(key) if key.is_a?(Symbol)
+        end
+
+        # If there is an empty hash left, we remove it, so it's not considered commands.
+        #
+        definition_and_options = [] if definition_and_options.first.empty?
+      # Options passed
+      elsif definition_and_options.last.is_a?(Hash)
+        options = definition_and_options.pop
+      # No options passed
+      else
+        options = {}
+      end
+
+      [definition_and_options, options]
+    end
 
     # MAIN CASES ###########################################
 

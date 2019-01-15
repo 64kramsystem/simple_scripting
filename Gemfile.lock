@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    simple_scripting (0.10.0)
+    simple_scripting (0.10.1)
       parseconfig (~> 1.0)
 
 GEM

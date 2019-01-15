@@ -118,10 +118,10 @@ module SimpleScripting
       end
     end
 
-    def decode_arguments!(params_definition, arguments, auto_help, commands_stack=[])
+    def decode_arguments!(params_definition, arg_values, auto_help, commands_stack=[])
       result           = {}
       parser_opts_copy = nil  # not available outside the block
-      args             = {}   # { 'name' => mandatory? }
+      arg_definitions  = {}   # { 'name' => mandatory? }
 
       OptionParser.new do |parser_opts|
         params_definition.each do |param_definition|
@@ -129,7 +129,7 @@ module SimpleScripting
           when Array
             process_option_definition!(param_definition, parser_opts, result)
           when String
-            process_argument_definition!(param_definition, args)
+            process_argument_definition!(param_definition, arg_definitions)
           else
             # This is an error in the params definition, so it doesn't follow the user error/help
             # workflow.
@@ -142,7 +142,7 @@ module SimpleScripting
         #
         parser_opts.on('-h', '--help', 'Help') do
           if auto_help
-            throw :exit, ExitWithArgumentsHelpPrinting.new(commands_stack, args, parser_opts_copy)
+            throw :exit, ExitWithArgumentsHelpPrinting.new(commands_stack, arg_definitions, parser_opts_copy)
           else
             # Needs to be better handled. When help is required, generally, it trumps the
             # correctness of the rest of the options/arguments.
@@ -152,15 +152,18 @@ module SimpleScripting
         end
 
         parser_opts_copy = parser_opts
-      end.parse!(arguments)
+      end.parse!(arg_values)
 
-      first_arg_name = args.keys.first.to_s
-
-      if first_arg_name.start_with?('*')
-        process_varargs!(arguments, result, commands_stack, args, parser_opts_copy)
-      else
-        process_regular_argument!(arguments, result, commands_stack, args, parser_opts_copy)
+      arg_definitions.each do |arg_name, arg_is_mandatory|
+        if arg_name.to_s.start_with?('*')
+          arg_name = arg_name.to_s[1..-1].to_sym
+          process_varargs!(arg_values, result, commands_stack, arg_name, arg_is_mandatory)
+        else
+          process_regular_argument!(arg_values, result, commands_stack, arg_name, arg_is_mandatory)
+        end
       end
+
+      check_no_remaining_arguments(arg_values)
 
       result
     end
@@ -191,38 +194,25 @@ module SimpleScripting
       end
     end
 
-    def process_varargs!(arguments, result, commands_stack, args, parser_opts_copy)
-      first_arg_name = args.keys.first.to_s
+    def process_varargs!(arg_values, result, commands_stack, arg_name, arg_is_mandatory)
+      raise ArgumentError.new("Missing mandatory argument(s)") if arg_is_mandatory && arg_values.empty?
 
-      # Mandatory argument
-      if args.fetch(first_arg_name.to_sym)
-        if arguments.empty?
+      result[arg_name] = arg_values.dup
+      arg_values.clear
+    end
+
+    def process_regular_argument!(arg_values, result, commands_stack, arg_name, arg_is_mandatory)
+      if arg_values.empty?
+        if arg_is_mandatory
           raise ArgumentError.new("Missing mandatory argument(s)")
-        else
-          name = args.keys.first[1..-1].to_sym
-
-          result[name] = arguments
         end
-      # Optional
       else
-        name = args.keys.first[1..-1].to_sym
-
-        result[name] = arguments
+        result[arg_name] = arg_values.shift
       end
     end
 
-    def process_regular_argument!(arguments, result, commands_stack, args, parser_opts_copy)
-      min_args_size = args.count { |_, mandatory| mandatory }
-
-      if arguments.size < min_args_size
-        raise ArgumentError.new("Missing mandatory argument(s)")
-      elsif arguments.size > args.size
-        raise ArgumentError.new("Too many arguments")
-      else
-        arguments.zip(args) do |value, (name, _)|
-          result[name] = value
-        end
-      end
+    def check_no_remaining_arguments(arg_values)
+      raise ArgumentError.new("Too many arguments") if !arg_values.empty?
     end
 
     # HELPERS ##############################################

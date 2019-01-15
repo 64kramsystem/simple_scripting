@@ -157,9 +157,9 @@ module SimpleScripting
       first_arg_name = arg_definitions.keys.first.to_s
 
       if first_arg_name.start_with?('*')
-        process_varargs!(arg_values, result, commands_stack, arg_definitions, parser_opts_copy)
+        process_varargs!(arg_values, result, commands_stack, arg_definitions)
       else
-        process_regular_argument!(arg_values, result, commands_stack, arg_definitions, parser_opts_copy)
+        process_regular_argument!(arg_values, result, commands_stack, arg_definitions)
       end
 
       result
@@ -191,7 +191,7 @@ module SimpleScripting
       end
     end
 
-    def process_varargs!(arg_values, result, commands_stack, arg_definitions, parser_opts_copy)
+    def process_varargs!(arg_values, result, commands_stack, arg_definitions)
       first_arg_name = arg_definitions.keys.first.to_s
 
       # Mandatory argument
@@ -211,7 +211,7 @@ module SimpleScripting
       end
     end
 
-    def process_regular_argument!(arg_values, result, commands_stack, arg_definitions, parser_opts_copy)
+    def process_regular_argument!(arg_values, result, commands_stack, arg_definitions)
       min_args_size = arg_definitions.count { |_, mandatory| mandatory }
 
       if arg_values.size < min_args_size

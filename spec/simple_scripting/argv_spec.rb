@@ -169,28 +169,57 @@ describe SimpleScripting::Argv do
 
     describe '(mandatory)' do
 
-      let(:decoder_params) {[
-        '*varargs',
-        output:     output_buffer,
-      ]}
+      context 'as only parameter' do
 
-      it "should be decoded" do
-        decoder_params.last[:arguments] = ['varval1', 'varval2']
+        let(:decoder_params) {[
+          '*varargs',
+          output:     output_buffer,
+          arguments:  ['varval1', 'varval2'],
+        ]}
 
-        actual_result = described_class.decode(*decoder_params)
+        it "should be decoded" do
+          actual_result = described_class.decode(*decoder_params)
 
-        expected_result = {
-          varargs:   ['varval1', 'varval2'],
-        }
+          expected_result = {
+            varargs:   ['varval1', 'varval2'],
+          }
 
-        expect(actual_result).to eql(expected_result)
+          expect(actual_result).to eql(expected_result)
+        end
+
+      end
+
+      context 'followed by varargs' do
+
+        let(:decoder_params) {[
+          'mandatory',
+          '*varargs',
+          output:     output_buffer,
+          arguments:  ['mandval', 'varval1', 'varval2']
+        ]}
+
+        it "should be decoded" do
+          actual_result = described_class.decode(*decoder_params)
+
+          expected_result = {
+            mandatory: 'mandval',
+            varargs:   ['varval1', 'varval2'],
+          }
+
+          expect(actual_result).to eql(expected_result)
+        end
+
       end
 
       context "error handling" do
 
-        it "should exit when they are not specified" do
-          decoder_params.last[:arguments] = []
+        let(:decoder_params) {[
+          '*varargs',
+          output:     output_buffer,
+          arguments:  [],
+        ]}
 
+        it "should exit when they are not specified" do
           decoding = -> { described_class.decode(*decoder_params) }
 
           expect(decoding).to raise_error(SimpleScripting::Argv::ArgumentError, "Missing mandatory argument(s)")

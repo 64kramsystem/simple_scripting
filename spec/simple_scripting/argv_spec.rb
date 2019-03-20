@@ -153,7 +153,7 @@ describe SimpleScripting::Argv do
         expect(decoding).to raise_error(SimpleScripting::Argv::ArgumentError, "Missing mandatory argument(s)")
       end
 
-      it "should print an error and the help when there are too many arguments" do
+      it "should raise an error when there are too many arguments" do
         decoder_params.last[:arguments] = ['arg1', 'arg2', 'excessive_arg']
 
         decoding = -> { described_class.decode(*decoder_params) }
@@ -219,7 +219,7 @@ describe SimpleScripting::Argv do
           arguments:  [],
         ]}
 
-        it "should exit when they are not specified" do
+        it "should raise an error when they are not specified" do
           decoding = -> { described_class.decode(*decoder_params) }
 
           expect(decoding).to raise_error(SimpleScripting::Argv::ArgumentError, "Missing mandatory argument(s)")

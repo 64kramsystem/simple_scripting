@@ -67,7 +67,8 @@ describe SimpleScripting::Argv do
       it "should check all the options/arguments when --help is passed, raising an error when they're not correct" do
         decoder_params.last.merge!(
           arguments: ['--help'],
-          auto_help: false
+          auto_help: false,
+          raise_errors: true,
         )
 
         decoding = -> { described_class.decode(*decoder_params) }
@@ -145,8 +146,24 @@ describe SimpleScripting::Argv do
 
     context "error handling" do
 
-      it "should raise an error when mandatory arguments are missing" do
+      # All the other UTs use error raising, for convenience.
+      it "should print the error, with a previx, by default, instead of raising an error" do
         decoder_params.last[:arguments] = []
+
+        actual_result = described_class.decode(*decoder_params)
+
+        # Returning nil is an important specification, as it's part of the Argv protocol of doing
+        # so in case of problem/exit.
+        expect(actual_result).to be(nil)
+
+        expect(output_buffer.string).to eql("Command error!: Missing mandatory argument(s)\n")
+      end
+
+      it "should raise an error when mandatory arguments are missing" do
+        decoder_params.last.merge!(
+          arguments: [],
+          raise_errors: true,
+        )
 
         decoding = -> { described_class.decode(*decoder_params) }
 
@@ -154,7 +171,10 @@ describe SimpleScripting::Argv do
       end
 
       it "should raise an error when there are too many arguments" do
-        decoder_params.last[:arguments] = ['arg1', 'arg2', 'excessive_arg']
+        decoder_params.last.merge!(
+          arguments: ['arg1', 'arg2', 'excessive_arg'],
+          raise_errors: true,
+        )
 
         decoding = -> { described_class.decode(*decoder_params) }
 
@@ -220,6 +240,8 @@ describe SimpleScripting::Argv do
         ]}
 
         it "should raise an error when they are not specified" do
+          decoder_params.last[:raise_errors] = true
+
           decoding = -> { described_class.decode(*decoder_params) }
 
           expect(decoding).to raise_error(SimpleScripting::Argv::ArgumentError, "Missing mandatory argument(s)")
@@ -292,15 +314,21 @@ describe SimpleScripting::Argv do
       context "error handling" do
 
         it "should raise an error on invalid command" do
-          decoder_params[:arguments] = ['pizza']
+          decoder_params.merge!(
+            arguments: ['pizza'],
+            raise_errors: true,
+          )
 
           decoding = -> { described_class.decode(decoder_params) }
 
           expect(decoding).to raise_error(SimpleScripting::Argv::InvalidCommand, "Invalid command: pizza")
         end
 
-        it "should print a specific error message on missing command" do
-          decoder_params[:arguments] = []
+        it "should raise a specific error message on missing command" do
+          decoder_params.merge!(
+            arguments: [],
+            raise_errors: true,
+          )
 
           decoding = -> { described_class.decode(decoder_params) }
 
@@ -458,6 +486,7 @@ describe SimpleScripting::Argv do
 
     it 'should avoid options being interpreted as definitions' do
       decoder_params[:arguments] = ['pizza']
+      decoder_params[:raise_errors] = true
 
       decoding = -> { described_class.decode(decoder_params) }
 

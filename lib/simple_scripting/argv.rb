@@ -44,6 +44,7 @@ module SimpleScripting
       long_help = options[:long_help]
       auto_help = options.fetch(:auto_help, true)
       output    = options.fetch(:output, $stdout)
+      raise_errors = options.fetch(:raise_errors, false)
 
       # WATCH OUT! @long_help can also be set in :decode_command!. See issue #17.
       #
@@ -60,6 +61,12 @@ module SimpleScripting
       exit_data.print_help(output, @long_help)
 
       nil # to be used with the 'decode(...) || exit' pattern
+    rescue SimpleScripting::Argv::ArgumentError, SimpleScripting::Argv::InvalidCommand, OptionParser::InvalidOption => error
+      if raise_errors
+        raise
+      else
+        output.puts "Command error!: #{error.message}"
+      end
     ensure
       @long_help = nil
     end

@@ -10,10 +10,15 @@ module SimpleScripting
 
     extend self
 
-    def load(config_file: default_config_file, passwords_key: nil)
+    # `required`: list of strings. this currently support only keys outside a group; group names
+    #             are not considered keys.
+    #
+    def load(config_file: default_config_file, passwords_key: nil, required: [])
       create_empty_file(config_file) if !File.exists?(config_file)
 
       configuration = ParseConfig.new(config_file)
+
+      enforce_required_keys(configuration.params, required)
 
       convert_to_cool_format(OpenStruct.new, configuration.params, passwords_key)
     end
@@ -28,6 +33,12 @@ module SimpleScripting
       base_config_filename = '.' + File.basename($PROGRAM_NAME).chomp('.rb')
 
       File.expand_path(base_config_filename, '~')
+    end
+
+    def enforce_required_keys(configuration, required)
+      missing_keys = required - configuration.select { |key, value| !value.is_a?(Hash) }.keys
+
+      raise "Missing required configuration key(s): #{missing_keys.join(', ')}" if !missing_keys.empty?
     end
 
     # Performs two conversions:

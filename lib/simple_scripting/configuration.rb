@@ -10,6 +10,23 @@ module SimpleScripting
 
     extend self
 
+    # A Struct whose members can be defined at any time, via `[key] = value`.
+    # Missing member errors are friendly.
+    #
+    #===
+    # This class has requirements which explain the peculiar nature:
+    #
+    # 1. it needs to be a Struct, not an OpenStruct, since nonexisting key invocations must raise
+    #    an error;
+    # 2. it's convenient for it to be an OpenStruct, since we don't want to define at instantiation
+    #    time the members.
+    #
+    class ConfigurationStruct < OpenStruct
+      def method_missing(method_name)
+        raise "Key/group #{method_name.to_s.inspect} not found!"
+      end
+    end
+
     # `required`: list of strings. this currently support only keys outside a group; group names
     #             are not considered keys.
     #
@@ -20,7 +37,7 @@ module SimpleScripting
 
       enforce_required_keys(configuration.params, required)
 
-      convert_to_cool_format(OpenStruct.new, configuration.params, passwords_key)
+      convert_to_cool_format(ConfigurationStruct.new, configuration.params, passwords_key)
     end
 
     private
@@ -43,13 +60,13 @@ module SimpleScripting
 
     # Performs two conversions:
     #
-    # 1. the configuration as a whole is converted to an OpenStruct
+    # 1. the configuration as a whole is converted to a ConfigurationStruct
     # 2. the values are converted to SimpleScripting::Configuration::Value
     #
     def convert_to_cool_format(result_node, configuration_node, encryption_key)
       configuration_node.each do |key, value|
         if value.is_a?(Hash)
-          result_node[key] = OpenStruct.new
+          result_node[key] = ConfigurationStruct.new
           convert_to_cool_format(result_node[key], value, encryption_key)
         else
           result_node[key] = Value.new(value, encryption_key)

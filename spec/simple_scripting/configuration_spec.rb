@@ -62,6 +62,14 @@ g2_key=bang
     end
   end
 
+  it "should raise an error when a configuration entry is not found" do
+    with_tempfile(configuration_text) do |config_file|
+      configuration = described_class.load(config_file: config_file, passwords_key: 'encryption_key')
+
+      expect { configuration.mykey }.to raise_error(StandardError, 'Key/group "mykey" not found!')
+    end
+  end
+
   it "should create the configuration file if it doesn't exist" do
     temp_config_file = File.join(Dir.tmpdir, '.test_simple_scripting_config')
 

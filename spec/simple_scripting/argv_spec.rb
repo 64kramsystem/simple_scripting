@@ -13,7 +13,7 @@ describe SimpleScripting::Argv do
     let(:decoder_params) {[
       ['-a'                                        ],
       ['-b',                     '"-b" description'],
-      ['-c', '--c-switch'                          ],
+      ['-c', '--c-switch VAL1,VAL2'                ],
       ['-d', '--d-switch',       '"-d" description'],
       ['-e', '--e-switch VALUE'                    ],
       ['-f', '--f-switch VALUE', '"-f" description'],
@@ -34,7 +34,7 @@ describe SimpleScripting::Argv do
           Usage: rspec [options] <mandatory> [<optional>]
               -a
               -b                               "-b" description
-              -c, --c-switch
+              -c, --c-switch VAL1,VAL2
               -d, --d-switch                   "-d" description
               -e, --e-switch VALUE
               -f, --f-switch VALUE             "-f" description
@@ -78,15 +78,15 @@ describe SimpleScripting::Argv do
 
     end # context 'help'
 
-    it "should implement basic switches and arguments (all set)" do
-      decoder_params.last[:arguments] = ['-a', '-b', '-c', '-d', '-ev_swt', '-fv_swt', 'm_arg', 'o_arg']
+    it "should implement basic switches, with conversion, and arguments (all set)" do
+      decoder_params.last[:arguments] = ['-a', '-b', '-c', 'a,b,c', '-d', '-ev_swt', '-fv_swt', 'm_arg', 'o_arg']
 
       actual_result = described_class.decode(*decoder_params)
 
       expected_result = {
         a:          true,
         b:          true,
-        c_switch:   true,
+        c_switch:   %w(a b c),
         d_switch:   true,
         e_switch:   'v_swt',
         f_switch:   'v_swt',

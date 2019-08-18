@@ -210,8 +210,18 @@ module SimpleScripting
     # DEFINITIONS PROCESSING ###############################
 
     def process_option_definition!(param_definition, parser_opts, result)
+      # Work on a copy; in at least one case (data type definition), we perform destructive
+      # operations.
+      #
+      param_definition = param_definition.dup
+
       if param_definition[1] && param_definition[1].start_with?('--')
-        key = param_definition[1].split(' ')[0][2 .. -1].tr('-', '_').to_sym
+        raw_key, key_argument = param_definition[1].split(' ')
+        key = raw_key[2 .. -1].tr('-', '_').to_sym
+
+        if key_argument&.include?(',')
+          param_definition.insert(2, Array)
+        end
       else
         key = param_definition[0][1 .. -1].to_sym
       end

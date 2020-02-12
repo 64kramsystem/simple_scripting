@@ -323,7 +323,10 @@ module SimpleScripting
 
             decoding = -> { described_class.decode(decoder_params) }
 
-            expect(decoding).to raise_error(Argv::InvalidCommand, "Invalid command: pizza")
+            expect(decoding).to raise_error(an_instance_of(Argv::InvalidCommand).and having_attributes(
+              message: "Invalid command: pizza",
+              valid_commands: ["command1", "command2"],
+            ))
           end
 
           it "should raise a specific error message on missing command" do
@@ -334,7 +337,10 @@ module SimpleScripting
 
             decoding = -> { described_class.decode(decoder_params) }
 
-            expect(decoding).to raise_error(Argv::InvalidCommand, "Missing command")
+            expect(decoding).to raise_error(an_instance_of(Argv::InvalidCommand).and having_attributes(
+              message: "Missing command!",
+              valid_commands: ["command1", "command2"],
+            ))
           end
 
         end # context "error handling"

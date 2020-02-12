@@ -7,8 +7,18 @@ module SimpleScripting
     # The fact that the following errors don't descend from OptionParser::InvalidOption is somewhat
     # annoying, however, there should be no practical problem.
     #
-    class InvalidCommand < StandardError; end
     class ArgumentError < StandardError; end
+
+    class InvalidCommand < StandardError
+
+      attr_reader :valid_commands
+
+      def initialize(message, valid_commands)
+        super(message)
+        @valid_commands = valid_commands
+      end
+
+    end
 
     class ExitWithCommandsHelpPrinting < Struct.new(:commands_definition)
       # Note that :long_help is not used.
@@ -61,10 +71,18 @@ module SimpleScripting
       exit_data.print_help(output, @long_help)
 
       nil # to be used with the 'decode(...) || exit' pattern
-    rescue SimpleScripting::Argv::ArgumentError, SimpleScripting::Argv::InvalidCommand, OptionParser::InvalidOption => error
+    rescue SimpleScripting::Argv::ArgumentError, OptionParser::InvalidOption => error
       raise if raise_errors
         
       output.puts "Command error!: #{error.message}"
+    rescue SimpleScripting::Argv::InvalidCommand => error
+      raise if raise_errors
+
+      output.puts <<~MESSAGE
+        Command error!: #{error.message}"
+
+        Valid commands: #{error.valid_commands.join(", ")}
+      MESSAGE
     ensure
       @long_help = nil
     end
@@ -127,13 +145,13 @@ module SimpleScripting
 
       command = command_for_check
 
-      raise InvalidCommand.new("Missing command") if command.nil?
+      raise InvalidCommand.new("Missing command!", commands_definition.keys) if command.nil?
 
       command_params_definition = commands_definition[command]
 
       case command_params_definition
       when nil
-        raise InvalidCommand.new("Invalid command: #{command}")
+        raise InvalidCommand.new("Invalid command: #{command}", commands_definition.keys)
       when Hash
         commands_stack << command
 

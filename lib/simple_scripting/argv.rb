@@ -62,11 +62,9 @@ module SimpleScripting
 
       nil # to be used with the 'decode(...) || exit' pattern
     rescue SimpleScripting::Argv::ArgumentError, SimpleScripting::Argv::InvalidCommand, OptionParser::InvalidOption => error
-      if raise_errors
-        raise
-      else
-        output.puts "Command error!: #{error.message}"
-      end
+      raise if raise_errors
+        
+      output.puts "Command error!: #{error.message}"
     ensure
       @long_help = nil
     end

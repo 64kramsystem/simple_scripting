@@ -10,7 +10,7 @@ Gem::Specification.new do |s|
   s.platform    = Gem::Platform::RUBY
   s.required_ruby_version = '>= 2.3.0'
   s.authors     = ["Saverio Miroddi"]
-  s.date        = "2020-02-13"
+  s.date        = "2022-07-21"
   s.email       = ["saverio.pub2@gmail.com"]
   s.homepage    = "https://github.com/saveriomiroddi/simple_scripting"
   s.summary     = "Library for simplifying some typical scripting functionalities."

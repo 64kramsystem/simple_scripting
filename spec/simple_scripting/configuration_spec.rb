@@ -4,7 +4,6 @@ require 'tempfile'
 require 'tmpdir'
 
 module SimpleScripting::ConfigurationSpecHelper
-
   def with_tempfile(config_content)
     tempfile = Tempfile.new('ss_config_test')
     tempfile.write(config_content)
@@ -14,11 +13,9 @@ module SimpleScripting::ConfigurationSpecHelper
   ensure
     tempfile.unlink
   end
-
 end
 
 describe SimpleScripting::Configuration do
-
   include SimpleScripting::ConfigurationSpecHelper
 
   let(:configuration_text) {"
@@ -73,5 +70,4 @@ g2_key=bang
       File.delete(temp_config_file)
     end
   end
-
-end
+end # describe SimpleScripting::Configuration

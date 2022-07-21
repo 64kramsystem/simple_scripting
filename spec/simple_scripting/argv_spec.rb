@@ -3,15 +3,12 @@ require_relative '../../lib/simple_scripting/argv.rb'
 require 'stringio'
 
 module SimpleScripting
-
   describe Argv do
-
     let(:output_buffer) do
       StringIO.new
     end
 
     describe 'Basic functionality' do
-
       let(:decoder_params) {[
         ['-a'                                        ],
         ['-b',                     '"-b" description'],
@@ -26,7 +23,6 @@ module SimpleScripting
       ]}
 
       context 'help' do
-
         it 'should print help automatically by default' do
           decoder_params.last[:arguments] = ['-h']
 
@@ -73,11 +69,10 @@ module SimpleScripting
             raise_errors: true,
           )
 
-          decoding = -> { described_class.decode(*decoder_params) }
-
-          expect(decoding).to raise_error(Argv::ArgumentError, "Missing mandatory argument(s)")
+          expect {
+            described_class.decode(*decoder_params)
+          }.to raise_error(Argv::ArgumentError, "Missing mandatory argument(s)")
         end
-
       end # context 'help'
 
       it "should implement basic switches, with conversion, and arguments (all set)" do
@@ -135,7 +130,7 @@ module SimpleScripting
 
             expect(actual_result).to eql(expected_result)
           end
-        end
+        end # context "booleans"
 
         INVALID_BOOLS.each do |value|
           it "should raise an error on invalid bool #{value.inspect}" do
@@ -154,7 +149,6 @@ module SimpleScripting
       end
 
       context "multiple optional arguments" do
-
         let(:decoder_params) {[
           '[optional1]',
           '[optional2]',
@@ -185,11 +179,9 @@ module SimpleScripting
 
           expect(actual_result).to eql(expected_result)
         end
-
       end
 
       context "error handling" do
-
         # All the other UTs use error raising, for convenience.
         it "should print the error, with a previx, by default, instead of raising an error" do
           decoder_params.last[:arguments] = []
@@ -209,9 +201,9 @@ module SimpleScripting
             raise_errors: true,
           )
 
-          decoding = -> { described_class.decode(*decoder_params) }
-
-          expect(decoding).to raise_error(Argv::ArgumentError, "Missing mandatory argument(s)")
+          expect {
+            described_class.decode(*decoder_params)
+          }.to raise_error(Argv::ArgumentError, "Missing mandatory argument(s)")
         end
 
         it "should raise an error when there are too many arguments" do
@@ -220,21 +212,16 @@ module SimpleScripting
             raise_errors: true,
           )
 
-          decoding = -> { described_class.decode(*decoder_params) }
-
-          expect(decoding).to raise_error(Argv::ArgumentError, "Too many arguments")
+          expect {
+            described_class.decode(*decoder_params)
+          }.to raise_error(Argv::ArgumentError, "Too many arguments")
         end
-
       end # context "error handling"
-
     end # describe 'Basic functionality'
 
     describe 'Varargs' do
-
       describe '(mandatory)' do
-
         context 'as only parameter' do
-
           let(:decoder_params) {[
             '*varargs',
             output:     output_buffer,
@@ -250,11 +237,9 @@ module SimpleScripting
 
             expect(actual_result).to eql(expected_result)
           end
-
         end
 
         context 'followed by varargs' do
-
           let(:decoder_params) {[
             'mandatory',
             '*varargs',
@@ -272,11 +257,9 @@ module SimpleScripting
 
             expect(actual_result).to eql(expected_result)
           end
-
         end
 
         context "error handling" do
-
           let(:decoder_params) {[
             '*varargs',
             output:     output_buffer,
@@ -286,17 +269,14 @@ module SimpleScripting
           it "should raise an error when they are not specified" do
             decoder_params.last[:raise_errors] = true
 
-            decoding = -> { described_class.decode(*decoder_params) }
-
-            expect(decoding).to raise_error(Argv::ArgumentError, "Missing mandatory argument(s)")
+            expect {
+              described_class.decode(*decoder_params)
+            }.to raise_error(Argv::ArgumentError, "Missing mandatory argument(s)")
           end
-
         end # context "error handling"
-
       end # describe '(mandatory)'
 
       describe '(optional)' do
-
         let(:decoder_params) {[
           '[*varargs]',
           output:     output_buffer,
@@ -325,15 +305,11 @@ module SimpleScripting
 
           expect(actual_result).to eql(expected_result)
         end
-
       end # describe '(optional)'
-
     end # describe 'Varargs'
 
     describe 'Commands' do
-
       describe 'regular case' do
-
         let(:decoder_params) {{
           'command1' => [
             'arg1',
@@ -356,16 +332,15 @@ module SimpleScripting
         end
 
         context "error handling" do
-
           it "should raise an error on invalid command" do
             decoder_params.merge!(
               arguments: ['pizza'],
               raise_errors: true,
             )
 
-            decoding = -> { described_class.decode(decoder_params) }
-
-            expect(decoding).to raise_error(an_instance_of(Argv::InvalidCommand).and having_attributes(
+            expect {
+              described_class.decode(decoder_params)
+            }.to raise_error(an_instance_of(Argv::InvalidCommand).and having_attributes(
               message: "Invalid command: pizza",
               valid_commands: ["command1", "command2"],
             ))
@@ -377,18 +352,16 @@ module SimpleScripting
               raise_errors: true,
             )
 
-            decoding = -> { described_class.decode(decoder_params) }
-
-            expect(decoding).to raise_error(an_instance_of(Argv::InvalidCommand).and having_attributes(
+            expect {
+              described_class.decode(decoder_params)
+            }.to raise_error(an_instance_of(Argv::InvalidCommand).and having_attributes(
               message: "Missing command!",
               valid_commands: ["command1", "command2"],
             ))
           end
-
         end # context "error handling"
 
         context "help" do
-
           it 'should implement the commands help' do
             decoder_params[:arguments] = ['-h']
 
@@ -419,7 +392,6 @@ module SimpleScripting
           end
 
           context 'auto_help: false' do
-
             it 'should not interpret the --help argument, and not print the help' do
               decoder_params.merge!(
                 arguments: ['-h'],
@@ -449,15 +421,11 @@ module SimpleScripting
 
               expect(actual_result).to eql(expected_result)
             end
-
           end # context 'auto_help: false'
-
         end # context 'help'
-
       end # describe 'regular case'
 
       describe 'Nested commands' do
-
         let(:decoder_params) {{
           'command1' => {
             'nested1a' => [
@@ -523,13 +491,11 @@ module SimpleScripting
           expect(output_buffer.string).to eql(expected_output)
         end
       end # describe 'Nested commands'
-
     end # describe 'Commands'
 
     # Special case.
     #
     describe 'No definitions given' do
-
       let(:decoder_params) {{
         output:     output_buffer,
       }}
@@ -538,13 +504,10 @@ module SimpleScripting
         decoder_params[:arguments] = ['pizza']
         decoder_params[:raise_errors] = true
 
-        decoding = -> { described_class.decode(decoder_params) }
-
-        expect(decoding).to raise_error(Argv::ArgumentError, "Too many arguments")
+        expect {
+          described_class.decode(decoder_params)
+        }.to raise_error(Argv::ArgumentError, "Too many arguments")
       end
-
     end # describe 'No definitions given'
-
   end # describe Argv
-
 end # module SimpleScripting

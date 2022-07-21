@@ -3,7 +3,6 @@
 require_relative '../../lib/simple_scripting/tab_completion.rb'
 
 describe SimpleScripting::TabCompletion do
-
   include TabCompletionCustomRSpecMatchers
 
   let(:output_buffer) {
@@ -45,9 +44,7 @@ describe SimpleScripting::TabCompletion do
   subject { described_class.new(switches_definition, output: output_buffer) }
 
   context "with a correct configuration" do
-
     context "standard cases" do
-
       # Note that the conversion of mandatory to optional argument is defined by most of the cases.
       #
       STANDARD_CASES = {
@@ -79,11 +76,9 @@ describe SimpleScripting::TabCompletion do
           expect(symbolic_commandline_options).to complete_with(expected_entries)
         end
       end
-
     end # context "standard cases"
 
     context "suffix management" do
-
       SUFFIX_CASES = {
         "arg1<tab>v"        => %w(arg1v1 arg1v2), # the execution target of the test suite doesn't
         "arg1<tab>x"        => %w(),              # ignore the suffix; programmer-defined
@@ -97,11 +92,9 @@ describe SimpleScripting::TabCompletion do
           expect(symbolic_commandline_options).to complete_with(expected_entries)
         end
       end
-
     end # context "suffix management"
 
     context "escaped cases" do
-
       ESCAPED_CASES = {
         "\ <tab>"           => [" _argv1spc"],
         '\-<tab>'           => %w(),                       # this is the result of typing `command "\-<tab>`
@@ -111,7 +104,6 @@ describe SimpleScripting::TabCompletion do
       ESCAPED_CASES.each do |symbolic_commandline_options, _|
         it "should output the entries for #{symbolic_commandline_options.inspect}"
       end
-
     end # context "escaped cases"
 
     it "should support multiple values for an option"
@@ -119,11 +111,9 @@ describe SimpleScripting::TabCompletion do
     it "should keep parsing also when --help is passed" do
       expect("--help a<tab>").to complete_with(%w(arg1v1 arg1v2))
     end
-
   end # context "with a correct configuration"
 
   context "with an incorrect configuration" do
-
     INCORRECT_CASES = [
       "a b <tab>",        # too many args
       "-O<tab>",          # no values for this option
@@ -134,7 +124,5 @@ describe SimpleScripting::TabCompletion do
         expect(symbolic_commandline_options).to not_complete
       end
     end
-
   end # context "with an incorrect configuration"
-
 end # describe SimpleScripting::TabCompletion

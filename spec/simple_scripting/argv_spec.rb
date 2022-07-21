@@ -111,6 +111,48 @@ module SimpleScripting
         expect(actual_result).to eql(expected_result)
       end
 
+      context "booleans" do
+        VALID_BOOLS = {
+          'false' => false,
+          'true'  => true,
+        }
+
+        INVALID_BOOLS = %w[falx FALSE TRUE]
+
+        VALID_BOOLS.each do |user_value, decoded_value|
+          it "should decode a #{decoded_value} value" do
+            decoder_params = [
+              ["-b", "--mybool VAL", TrueClass],
+              output:     output_buffer,
+              arguments: ['--mybool', 'false']
+            ]
+
+            actual_result = described_class.decode(*decoder_params)
+
+            expected_result = {
+              mybool: false
+            }
+
+            expect(actual_result).to eql(expected_result)
+          end
+        end
+
+        INVALID_BOOLS.each do |value|
+          it "should raise an error on invalid bool #{value.inspect}" do
+            decoder_params = [
+              ["-b", "--mybool VAL", TrueClass],
+              output:       output_buffer,
+              arguments:    ['--mybool', value],
+              raise_errors: true,
+            ]
+
+            expect {
+              described_class.decode(*decoder_params)
+            }.to raise_error(OptionParser::InvalidArgument)
+          end
+        end
+      end
+
       context "multiple optional arguments" do
 
         let(:decoder_params) {[

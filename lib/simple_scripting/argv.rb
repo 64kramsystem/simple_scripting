@@ -243,7 +243,8 @@ module SimpleScripting
       end
 
       parser_opts.on(*param_definition) do |value|
-        result[key] = value || true
+        raise "Unexpected (nil; likely programmatic error) value for param definition #{param_definition}" if value.nil?
+        result[key] = value
       end
     end
 

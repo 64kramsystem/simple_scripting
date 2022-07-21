@@ -69,9 +69,9 @@ module SimpleScripting
             raise_errors: true,
           )
 
-          decoding = -> { described_class.decode(*decoder_params) }
-
-          expect(decoding).to raise_error(Argv::ArgumentError, "Missing mandatory argument(s)")
+          expect {
+            described_class.decode(*decoder_params)
+          }.to raise_error(Argv::ArgumentError, "Missing mandatory argument(s)")
         end
       end # context 'help'
 
@@ -201,9 +201,9 @@ module SimpleScripting
             raise_errors: true,
           )
 
-          decoding = -> { described_class.decode(*decoder_params) }
-
-          expect(decoding).to raise_error(Argv::ArgumentError, "Missing mandatory argument(s)")
+          expect {
+            described_class.decode(*decoder_params)
+          }.to raise_error(Argv::ArgumentError, "Missing mandatory argument(s)")
         end
 
         it "should raise an error when there are too many arguments" do
@@ -212,9 +212,9 @@ module SimpleScripting
             raise_errors: true,
           )
 
-          decoding = -> { described_class.decode(*decoder_params) }
-
-          expect(decoding).to raise_error(Argv::ArgumentError, "Too many arguments")
+          expect {
+            described_class.decode(*decoder_params)
+          }.to raise_error(Argv::ArgumentError, "Too many arguments")
         end
       end # context "error handling"
     end # describe 'Basic functionality'
@@ -269,9 +269,9 @@ module SimpleScripting
           it "should raise an error when they are not specified" do
             decoder_params.last[:raise_errors] = true
 
-            decoding = -> { described_class.decode(*decoder_params) }
-
-            expect(decoding).to raise_error(Argv::ArgumentError, "Missing mandatory argument(s)")
+            expect {
+              described_class.decode(*decoder_params)
+            }.to raise_error(Argv::ArgumentError, "Missing mandatory argument(s)")
           end
         end # context "error handling"
       end # describe '(mandatory)'
@@ -338,9 +338,9 @@ module SimpleScripting
               raise_errors: true,
             )
 
-            decoding = -> { described_class.decode(decoder_params) }
-
-            expect(decoding).to raise_error(an_instance_of(Argv::InvalidCommand).and having_attributes(
+            expect {
+              described_class.decode(decoder_params)
+            }.to raise_error(an_instance_of(Argv::InvalidCommand).and having_attributes(
               message: "Invalid command: pizza",
               valid_commands: ["command1", "command2"],
             ))
@@ -352,9 +352,9 @@ module SimpleScripting
               raise_errors: true,
             )
 
-            decoding = -> { described_class.decode(decoder_params) }
-
-            expect(decoding).to raise_error(an_instance_of(Argv::InvalidCommand).and having_attributes(
+            expect {
+              described_class.decode(decoder_params)
+            }.to raise_error(an_instance_of(Argv::InvalidCommand).and having_attributes(
               message: "Missing command!",
               valid_commands: ["command1", "command2"],
             ))
@@ -504,9 +504,9 @@ module SimpleScripting
         decoder_params[:arguments] = ['pizza']
         decoder_params[:raise_errors] = true
 
-        decoding = -> { described_class.decode(decoder_params) }
-
-        expect(decoding).to raise_error(Argv::ArgumentError, "Too many arguments")
+        expect {
+          described_class.decode(decoder_params)
+        }.to raise_error(Argv::ArgumentError, "Too many arguments")
       end
     end # describe 'No definitions given'
   end # describe Argv

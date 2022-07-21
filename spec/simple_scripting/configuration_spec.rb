@@ -53,9 +53,9 @@ g2_key=bang
 
   it "should raise an error when required keys are missing" do
     with_tempfile(configuration_text) do |config_file|
-      error_call = -> { described_class.load(config_file: config_file, required: %w(abspath_key missing_key group1)) }
-
-      expect(error_call).to raise_error(RuntimeError, "Missing required configuration key(s): missing_key, group1")
+      expect {
+        described_class.load(config_file: config_file, required: %w(abspath_key missing_key group1))
+      }.to raise_error(RuntimeError, "Missing required configuration key(s): missing_key, group1")
     end
   end
 

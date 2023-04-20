@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
   s.name        = "simple_scripting"
   s.version     = SimpleScripting::VERSION
   s.platform    = Gem::Platform::RUBY
-  s.required_ruby_version = '>= 2.3.0'
+  s.required_ruby_version = '>= 2.7.0'
   s.authors     = ["Saverio Miroddi"]
   s.date        = "2022-07-21"
   s.email       = ["saverio.pub2@gmail.com"]

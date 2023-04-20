@@ -14,7 +14,7 @@ module SimpleScripting
     #             are not considered keys.
     #
     def load(config_file: default_config_file, passwords_key: nil, required: [])
-      create_empty_file(config_file) if !File.exists?(config_file)
+      create_empty_file(config_file) if !File.exist?(config_file)
 
       configuration = ParseConfig.new(config_file)
 

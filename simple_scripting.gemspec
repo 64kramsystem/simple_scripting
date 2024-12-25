@@ -18,6 +18,7 @@ Gem::Specification.new do |s|
   s.license     = "GPL-3.0"
 
   s.add_runtime_dependency     "parseconfig", "~> 1.0"
+  s.add_runtime_dependency     "ostruct",     "~> 0.6.1"
 
   s.add_development_dependency "rake",        "~> 12.0"
   s.add_development_dependency "rspec",       "~> 3.7"

@@ -79,7 +79,7 @@ module SimpleScripting
       raise if raise_errors
 
       output.puts <<~MESSAGE
-        Command error!: #{error.message}"
+        Command error!: #{error.message}
 
         Valid commands: #{error.valid_commands.join(", ")}
       MESSAGE

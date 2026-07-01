@@ -359,6 +359,19 @@ module SimpleScripting
               valid_commands: ["command1", "command2"],
             ))
           end
+
+          it "should print the invalid-command error and valid commands by default, instead of raising" do
+            decoder_params[:arguments] = ['pizza']
+
+            actual_result = described_class.decode(decoder_params)
+
+            expect(actual_result).to be(nil)
+            expect(output_buffer.string).to eql(<<~OUTPUT)
+              Command error!: Invalid command: pizza
+
+              Valid commands: command1, command2
+            OUTPUT
+          end
         end # context "error handling"
 
         context "help" do

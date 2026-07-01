@@ -1,6 +1,5 @@
 [![Gem Version][GV img]](https://rubygems.org/gems/simple_scripting)
-[![Build Status][BS img]](https://travis-ci.org/saveriomiroddi/simple_scripting)
-[![Coverage Status][CS img]](https://coveralls.io/r/saveriomiroddi/simple_scripting)
+[![CI][CI img]](https://github.com/64kramsystem/simple_scripting/actions/workflows/ci.yml)
 
 # SimpleScripting
 
@@ -89,7 +88,7 @@ Note that a **recent version of Zsh is required**; the stock Ubuntu 16.04 versio
 
 ### More complex use cases
 
-For a description of the more complex use cases, including edge cases and error handling, see the [wiki](https://github.com/saveriomiroddi/simple_scripting/wiki/SimpleScripting::TabCompletion-Guide).
+For a description of the more complex use cases, including edge cases and error handling, see the [wiki](https://github.com/64kramsystem/simple_scripting/wiki/SimpleScripting::TabCompletion-Guide).
 
 ## SimpleScripting::Argv
 
@@ -150,7 +149,7 @@ Commands are also supported (with unlimited depth), by using a hash:
       }
     ) || exit
 
-For the guide, see the [wiki page](https://github.com/saveriomiroddi/simple_scripting/wiki/SimpleScripting::Argv-Guide).
+For the guide, see the [wiki page](https://github.com/64kramsystem/simple_scripting/wiki/SimpleScripting::Argv-Guide).
 
 ## SimpleScripting::Configuration
 
@@ -189,8 +188,7 @@ The purpose of encryption in this library is just to avoid displaying passwords 
 
 ## Help
 
-See the [wiki](https://github.com/saveriomiroddi/simple_scripting/wiki) for additional help.
+See the [wiki](https://github.com/64kramsystem/simple_scripting/wiki) for additional help.
 
 [GV img]: https://badge.fury.io/rb/simple_scripting.png
-[BS img]: https://travis-ci.org/saveriomiroddi/simple_scripting.svg?branch=master
-[CS img]: https://coveralls.io/repos/saveriomiroddi/simple_scripting/badge.png?branch=master
+[CI img]: https://github.com/64kramsystem/simple_scripting/actions/workflows/ci.yml/badge.svg

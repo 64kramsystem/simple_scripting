@@ -8,11 +8,11 @@ Gem::Specification.new do |s|
   s.name        = "simple_scripting"
   s.version     = SimpleScripting::VERSION
   s.platform    = Gem::Platform::RUBY
-  s.required_ruby_version = '>= 2.7.0'
+  s.required_ruby_version = '>= 3.2.0'
   s.authors     = ["Saverio Miroddi"]
   s.date        = "2024-12-25"
   s.email       = ["saverio.pub2@gmail.com"]
-  s.homepage    = "https://github.com/saveriomiroddi/simple_scripting"
+  s.homepage    = "https://github.com/64kramsystem/simple_scripting"
   s.summary     = "Library for simplifying some typical scripting functionalities."
   s.description = "Simplifies options parsing and configuration loading."
   s.license     = "GPL-3.0"

@@ -3,7 +3,7 @@ source 'https://rubygems.org'
 gemspec
 
 group :test do
-  gem 'coveralls', '~> 0.8.23', require: false
+  gem 'simplecov', '~> 0.22', require: false
 end
 
 group :tools do

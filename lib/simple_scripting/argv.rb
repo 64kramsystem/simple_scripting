@@ -21,14 +21,13 @@ module SimpleScripting
     end
 
     class ExitWithCommandsHelpPrinting < Struct.new(:commands_definition)
-      # Note that :long_help is not used.
-      def print_help(output, long_help)
+      def print_help(output)
         output.puts "Valid commands:", "", "  " + commands_definition.keys.join(', ')
       end
     end
 
-    class ExitWithArgumentsHelpPrinting < Struct.new(:commands_stack, :args, :parser_opts_copy)
-      def print_help(output, long_help)
+    class ExitWithArgumentsHelpPrinting < Struct.new(:commands_stack, :args, :parser_opts_copy, :long_help)
+      def print_help(output)
         parser_opts_help = parser_opts_copy.to_s
 
         if commands_stack.size > 0
@@ -56,19 +55,15 @@ module SimpleScripting
       output    = options.fetch(:output, $stdout)
       raise_errors = options.fetch(:raise_errors, false)
 
-      # WATCH OUT! @long_help can also be set in :decode_command!. See issue #17.
-      #
-      @long_help = long_help
-
       exit_data = catch(:exit) do
         if params_definition.first.is_a?(Hash)
-          return decode_command!(params_definition, arguments, auto_help)
+          return decode_command!(params_definition, arguments, auto_help, long_help)
         else
-          return decode_arguments!(params_definition, arguments, auto_help)
+          return decode_arguments!(params_definition, arguments, auto_help, long_help)
         end
       end
 
-      exit_data.print_help(output, @long_help)
+      exit_data.print_help(output)
 
       nil # to be used with the 'decode(...) || exit' pattern
     rescue SimpleScripting::Argv::ArgumentError, OptionParser::InvalidOption => error
@@ -83,8 +78,6 @@ module SimpleScripting
 
         Valid commands: #{error.valid_commands.join(", ")}
       MESSAGE
-    ensure
-      @long_help = nil
     end
 
     private
@@ -120,7 +113,7 @@ module SimpleScripting
     #
     #   [{"command1"=>["arg1", {:long_help=>"This is the long help."}], "command2"=>["arg2"]}]
     #
-    def decode_command!(params_definition, arguments, auto_help, commands_stack=[])
+    def decode_command!(params_definition, arguments, auto_help, long_help, commands_stack=[])
       commands_definition = params_definition.first
 
       # Set the `command` variable only after; in the case where we print the help, this variable
@@ -157,23 +150,23 @@ module SimpleScripting
 
         # Nested case! Decode recursively
         #
-        decode_command!([command_params_definition], arguments, auto_help, commands_stack)
+        decode_command!([command_params_definition], arguments, auto_help, long_help, commands_stack)
       else
         commands_stack << command
 
         if command_params_definition.last.is_a?(Hash)
           internal_params = command_params_definition.pop # only long_help is here, if present
-          @long_help = internal_params.delete(:long_help)
+          long_help = internal_params.delete(:long_help)
         end
 
         [
           compose_returned_commands(commands_stack),
-          decode_arguments!(command_params_definition, arguments, auto_help, commands_stack),
+          decode_arguments!(command_params_definition, arguments, auto_help, long_help, commands_stack),
         ]
       end
     end
 
-    def decode_arguments!(params_definition, arg_values, auto_help, commands_stack=[])
+    def decode_arguments!(params_definition, arg_values, auto_help, long_help, commands_stack=[])
       result           = {}
       parser_opts_copy = nil  # not available outside the block
       arg_definitions  = {}   # { 'name' => mandatory? }
@@ -197,7 +190,7 @@ module SimpleScripting
         #
         parser_opts.on('-h', '--help', 'Help') do
           if auto_help
-            throw :exit, ExitWithArgumentsHelpPrinting.new(commands_stack, arg_definitions, parser_opts_copy)
+            throw :exit, ExitWithArgumentsHelpPrinting.new(commands_stack, arg_definitions, parser_opts_copy, long_help)
           else
             # Needs to be better handled. When help is required, generally, it trumps the
             # correctness of the rest of the options/arguments.

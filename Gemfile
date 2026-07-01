@@ -7,6 +7,6 @@ group :test do
 end
 
 group :tools do
-  gem 'byebug', '~> 10.0.2'
+  gem 'byebug'
   gem 'rubocop', '= 0.58.1'
 end

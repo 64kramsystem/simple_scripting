@@ -19,6 +19,7 @@ Gem::Specification.new do |s|
 
   s.add_runtime_dependency     "parseconfig", "~> 1.0"
   s.add_runtime_dependency     "ostruct",     "~> 0.6.1"
+  s.add_runtime_dependency     "base64",      "~> 0.3"
 
   s.add_development_dependency "rake",        "~> 12.0"
   s.add_development_dependency "rspec",       "~> 3.7"

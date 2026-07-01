@@ -1,6 +1,5 @@
 [![Gem Version][GV img]](https://rubygems.org/gems/simple_scripting)
-[![Build Status][BS img]](https://travis-ci.org/saveriomiroddi/simple_scripting)
-[![Coverage Status][CS img]](https://coveralls.io/r/saveriomiroddi/simple_scripting)
+[![CI][CI img]](https://github.com/64kramsystem/simple_scripting/actions/workflows/ci.yml)
 
 # SimpleScripting
 
@@ -192,5 +191,4 @@ The purpose of encryption in this library is just to avoid displaying passwords 
 See the [wiki](https://github.com/saveriomiroddi/simple_scripting/wiki) for additional help.
 
 [GV img]: https://badge.fury.io/rb/simple_scripting.png
-[BS img]: https://travis-ci.org/saveriomiroddi/simple_scripting.svg?branch=master
-[CS img]: https://coveralls.io/repos/saveriomiroddi/simple_scripting/badge.png?branch=master
+[CI img]: https://github.com/64kramsystem/simple_scripting/actions/workflows/ci.yml/badge.svg

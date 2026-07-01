@@ -205,9 +205,9 @@ module SimpleScripting
       arg_definitions.each do |arg_name, arg_is_mandatory|
         if arg_name.to_s.start_with?('*')
           arg_name = arg_name.to_s[1..-1].to_sym
-          process_varargs!(arg_values, result, commands_stack, arg_name, arg_is_mandatory)
+          process_varargs!(arg_values, result, arg_name, arg_is_mandatory)
         else
-          process_regular_argument!(arg_values, result, commands_stack, arg_name, arg_is_mandatory)
+          process_regular_argument!(arg_values, result, arg_name, arg_is_mandatory)
         end
       end
 
@@ -253,14 +253,14 @@ module SimpleScripting
       end
     end
 
-    def process_varargs!(arg_values, result, commands_stack, arg_name, arg_is_mandatory)
+    def process_varargs!(arg_values, result, arg_name, arg_is_mandatory)
       raise ArgumentError.new("Missing mandatory argument(s)") if arg_is_mandatory && arg_values.empty?
 
       result[arg_name] = arg_values.dup
       arg_values.clear
     end
 
-    def process_regular_argument!(arg_values, result, commands_stack, arg_name, arg_is_mandatory)
+    def process_regular_argument!(arg_values, result, arg_name, arg_is_mandatory)
       if arg_values.empty?
         if arg_is_mandatory
           raise ArgumentError.new("Missing mandatory argument(s)")

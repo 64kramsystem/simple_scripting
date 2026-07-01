@@ -29,7 +29,7 @@ module SimpleScripting
       commandline_processor = CommandlineProcessor.process_commandline(source_commandline, cursor_position, @switches_definition)
 
       if commandline_processor.completing_an_option?
-        complete_option(commandline_processor, execution_target)
+        complete_option(commandline_processor)
       elsif commandline_processor.parsing_error?
         return
       else # completing_a_value?
@@ -43,7 +43,7 @@ module SimpleScripting
     # Completion!
     #############################################
 
-    def complete_option(commandline_processor, execution_target)
+    def complete_option(commandline_processor)
       all_switches = @switches_definition.select { |definition| definition.is_a?(Array) }.map { |definition| definition[1][/^--\S+/] }
 
       matching_switches = all_switches.select { |switch| switch.start_with?(commandline_processor.completing_word_prefix) }

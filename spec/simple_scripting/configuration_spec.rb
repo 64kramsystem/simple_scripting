@@ -70,4 +70,22 @@ g2_key=bang
       File.delete(temp_config_file)
     end
   end
+
+  it "should derive the default config file from the program name, when none is given" do
+    Dir.mktmpdir do |home|
+      original_home = ENV['HOME']
+      original_prog = $PROGRAM_NAME
+      ENV['HOME'] = home
+      $PROGRAM_NAME = 'my_test_prog.rb'
+
+      begin
+        described_class.load
+
+        expect(File).to exist(File.join(home, '.my_test_prog'))
+      ensure
+        ENV['HOME'] = original_home
+        $PROGRAM_NAME = original_prog
+      end
+    end
+  end
 end # describe SimpleScripting::Configuration

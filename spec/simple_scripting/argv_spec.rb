@@ -522,5 +522,26 @@ module SimpleScripting
         }.to raise_error(Argv::ArgumentError, "Too many arguments")
       end
     end # describe 'No definitions given'
+
+    describe 'Definition/options handling' do
+      it "should work when no options hash is passed, reading ARGV" do
+        original_argv = ARGV.dup
+        ARGV.replace(['m_arg'])
+
+        begin
+          actual_result = described_class.decode('mandatory')
+
+          expect(actual_result).to eql(mandatory: 'm_arg')
+        ensure
+          ARGV.replace(original_argv)
+        end
+      end
+
+      it "should raise on an unrecognized param definition" do
+        expect {
+          described_class.decode(123, arguments: [], output: output_buffer)
+        }.to raise_error(RuntimeError, "Unrecognized value: 123")
+      end
+    end # describe 'Definition/options handling'
   end # describe Argv
 end # module SimpleScripting

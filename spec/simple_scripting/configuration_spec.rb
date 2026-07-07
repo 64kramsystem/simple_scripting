@@ -51,6 +51,16 @@ g2_key=bang
     end
   end
 
+  it "should raise an error when decrypting a value without the passwords key" do
+    with_tempfile(configuration_text) do |config_file|
+      configuration = described_class.load(config_file: config_file)
+
+      expect {
+        configuration.encr_key.decrypted
+      }.to raise_error("Encryption key not provided!")
+    end
+  end
+
   it "should raise an error when required keys are missing" do
     with_tempfile(configuration_text) do |config_file|
       expect {

@@ -117,6 +117,10 @@ describe SimpleScripting::TabCompletion do
       expect("--multi multiv1,m<tab>").to complete_with(%w(multiv1))
     end
 
+    it "should use the next cursor marker when the commandline contains the base one" do
+      expect("a<tab0> <tab>").to complete_with(%w(arg2v1 arg2v2 --arg2v3))
+    end
+
     it "should keep parsing also when --help is passed" do
       expect("--help a<tab>").to complete_with(%w(arg1v1 arg1v2))
     end

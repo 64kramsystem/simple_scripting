@@ -45,6 +45,18 @@ module SimpleScripting
           expect(return_value).to be(nil)
         end
 
+        it 'should print help without arguments usage and long help, when they are not defined' do
+          described_class.decode(['-a'], output: output_buffer, arguments: ['-h'])
+
+          expected_output = <<~OUTPUT
+            Usage: rspec [options]
+                -a
+                -h, --help                       Help
+          OUTPUT
+
+          expect(output_buffer.string).to eql(expected_output)
+        end
+
         it 'should not interpret the --help argument, and not print the help, on auto_help: false' do
           decoder_params.last.merge!(
             arguments: ['--help', 'm_arg'],

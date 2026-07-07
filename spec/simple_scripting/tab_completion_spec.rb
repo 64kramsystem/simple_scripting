@@ -114,14 +114,16 @@ describe SimpleScripting::TabCompletion do
   end # context "with a correct configuration"
 
   context "with an incorrect configuration" do
-    INCORRECT_CASES = [
-      "a b <tab>",        # too many args
-      "-O<tab>",          # no values for this option
-    ]
+    INCORRECT_CASES = {
+      "a b <tab>" => "Command error!: Too many arguments\n",        # too many args
+      "-O<tab>"   => "Command error!: invalid option: -<tab0>\n",   # no values for this option
+    }
 
-    INCORRECT_CASES.each do |symbolic_commandline_options|
+    INCORRECT_CASES.each do |symbolic_commandline_options, expected_error_message|
       it "should not output any entries for #{symbolic_commandline_options.inspect}" do
-        expect(symbolic_commandline_options).to not_complete
+        expect {
+          expect(symbolic_commandline_options).to not_complete
+        }.to output(expected_error_message).to_stdout
       end
     end
   end # context "with an incorrect configuration"

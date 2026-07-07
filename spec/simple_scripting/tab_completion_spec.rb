@@ -13,6 +13,7 @@ describe SimpleScripting::TabCompletion do
     [
       ["-o", "--opt1 ARG"],
       ["-O", "--opt2"],
+      ["-m", "--multi V1,V2"],
       "arg1",               # this and the following are internally converted to optional, as
       "arg2",               # according to the Argv spec, without brackets they are mandatory.
     ]
@@ -31,6 +32,10 @@ describe SimpleScripting::TabCompletion do
         # A value starting with space is valid.
         #
         ['arg1v1', 'arg1v2', '_arg1v3', ' _argv1spc'].select { |entry| entry =~ /^#{prefix}#{suffix}/ }
+      end
+
+      def multi(prefix, suffix, context)
+        %w(multiv1 _multiv2).select { |entry| entry =~ /^#{prefix}#{suffix}/ }
       end
 
       def arg2(prefix, suffix, context)
@@ -57,11 +62,11 @@ describe SimpleScripting::TabCompletion do
         "a -- --<tab>"      => %w(--arg2v3),
         "-- --aaa <tab>"    => %w(arg2v1 arg2v2 --arg2v3),
 
-        "--<tab>"           => %w(--opt1 --opt2),
-        "--<tab> a"         => %w(--opt1 --opt2),
-        "--<tab> -- a"      => %w(--opt1 --opt2),
-        "--<tab> -- b"      => %w(--opt1 --opt2),
-        "--<tab> --xyz"     => %w(--opt1 --opt2),
+        "--<tab>"           => %w(--opt1 --opt2 --multi),
+        "--<tab> a"         => %w(--opt1 --opt2 --multi),
+        "--<tab> -- a"      => %w(--opt1 --opt2 --multi),
+        "--<tab> -- b"      => %w(--opt1 --opt2 --multi),
+        "--<tab> --xyz"     => %w(--opt1 --opt2 --multi),
         "--opt1 <tab> a"    => %w(opt1v1 _opt1v2),
         "--opt1 o<tab> a"   => %w(opt1v1),
 
@@ -108,7 +113,9 @@ describe SimpleScripting::TabCompletion do
       end
     end # context "escaped cases"
 
-    it "should support multiple values for an option"
+    it "should support multiple values for an option" do
+      expect("--multi multiv1,m<tab>").to complete_with(%w(multiv1))
+    end
 
     it "should keep parsing also when --help is passed" do
       expect("--help a<tab>").to complete_with(%w(arg1v1 arg1v2))

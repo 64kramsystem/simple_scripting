@@ -61,12 +61,18 @@ module SimpleScripting
         parsed_pairs = parse_argv || raise("Parsing error")
 
         key, value = parsed_pairs.detect do |_, value|
-          !boolean?(value) && value.include?(cursor_marker)
+          if value.is_a?(Array)
+            value.any? { |entry| entry.include?(cursor_marker) }
+          else
+            !boolean?(value) && value.include?(cursor_marker)
+          end
         end
 
         # Impossible case, unless there is a programmatic error.
         #
         key || raise("Guru meditation! (#{self.class}##{__method__}:#{__LINE__})")
+
+        value = value.detect { |entry| entry.include?(cursor_marker) } if value.is_a?(Array)
 
         value_prefix, value_suffix = value.split(cursor_marker)
 

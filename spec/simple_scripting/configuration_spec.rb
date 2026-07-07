@@ -51,6 +51,32 @@ g2_key=bang
     end
   end
 
+  it "should merge the .local configuration file, when present, over the main one" do
+    with_tempfile(configuration_text) do |config_file|
+      local_configuration_text = "
+relpath_key=local_foo
+
+[group1]
+g_key=local_baz
+      "
+
+      File.write("#{config_file}.local", local_configuration_text)
+
+      begin
+        configuration = described_class.load(config_file: config_file)
+
+        expect(configuration.relpath_key).to eql('local_foo')
+        expect(configuration.group1.g_key).to eql('local_baz')
+
+        # Keys not overridden are preserved.
+        expect(configuration.abspath_key).to eql('/tmp/bar')
+        expect(configuration.group2.g2_key).to eql('bang')
+      ensure
+        File.delete("#{config_file}.local")
+      end
+    end
+  end
+
   it "should raise an error when decrypting a value without the passwords key" do
     with_tempfile(configuration_text) do |config_file|
       configuration = described_class.load(config_file: config_file)

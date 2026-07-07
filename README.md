@@ -182,6 +182,10 @@ This is the workflow and functionality offered by `Configuration`:
 
     configuration.a_group.group_key                 # 'baz'; also supports #full_path and #decrypted
 
+### Local configuration
+
+If a file with the same name plus the `.local` suffix exists (e.g. `$HOME/.foo_my_bar.local`), its keys are merged over the main configuration's (per-group). This is useful for keeping the main file shared across machines, with machine-specific overrides in the local one.
+
 ### Encryption note
 
 The purpose of encryption in this library is just to avoid displaying passwords in plaintext; it's not considered safe against attacks.

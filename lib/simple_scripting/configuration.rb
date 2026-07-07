@@ -16,11 +16,21 @@ module SimpleScripting
     def load(config_file: default_config_file, passwords_key: nil, required: [])
       create_empty_file(config_file) if !File.exist?(config_file)
 
-      configuration = ParseConfig.new(config_file)
+      params = ParseConfig.new(config_file).params
 
-      enforce_required_keys(configuration.params, required)
+      local_config_file = "#{config_file}.local"
 
-      convert_to_cool_format(OpenStruct.new, configuration.params, passwords_key)
+      if File.exist?(local_config_file)
+        local_params = ParseConfig.new(local_config_file).params
+
+        params = params.merge(local_params) do |_, value, local_value|
+          value.is_a?(Hash) && local_value.is_a?(Hash) ? value.merge(local_value) : local_value
+        end
+      end
+
+      enforce_required_keys(params, required)
+
+      convert_to_cool_format(OpenStruct.new, params, passwords_key)
     end
 
     private

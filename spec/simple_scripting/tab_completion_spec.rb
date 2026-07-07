@@ -96,13 +96,15 @@ describe SimpleScripting::TabCompletion do
 
     context "escaped cases" do
       ESCAPED_CASES = {
-        "\ <tab>"           => [" _argv1spc"],
+        '\ <tab>'           => [" _argv1spc"],
         '\-<tab>'           => %w(),                       # this is the result of typing `command "\-<tab>`
         'a \-<tab>'         => %w(--arg2v3),
       }
 
-      ESCAPED_CASES.each do |symbolic_commandline_options, _|
-        it "should output the entries for #{symbolic_commandline_options.inspect}"
+      ESCAPED_CASES.each do |symbolic_commandline_options, expected_entries|
+        it "should output the entries for #{symbolic_commandline_options.inspect}" do
+          expect(symbolic_commandline_options).to complete_with(expected_entries)
+        end
       end
     end # context "escaped cases"
 

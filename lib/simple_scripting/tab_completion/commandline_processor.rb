@@ -8,7 +8,7 @@ module SimpleScripting
 
   class TabCompletion
 
-    class CommandlineProcessor < Struct.new(:processed_argv, :cursor_marker, :switches_definition)
+    class CommandlineProcessor < Struct.new(:processed_argv, :cursor_marker, :switches_definition, :escaped_dash)
 
       # Arbitrary; can be anything (except an empty string).
       BASE_CURSOR_MARKER = "<tab>"
@@ -27,7 +27,12 @@ module SimpleScripting
             # Remove the executable.
             processed_argv = Shellwords.split(commandline_with_marker)[1..-1]
 
-            return new(processed_argv, cursor_marker, switches_definition)
+            # Shellwords strips the backslash, losing the information that the word is a value, not
+            # an option.
+            #
+            escaped_dash = commandline_with_marker.match?(/(?:\A|\s)\\-\S*#{Regexp.escape(cursor_marker)}/)
+
+            return new(processed_argv, cursor_marker, switches_definition, escaped_dash)
           end
         end
       end
@@ -65,6 +70,8 @@ module SimpleScripting
 
         value_prefix, value_suffix = value.split(cursor_marker)
 
+        value_prefix = "-#{value_prefix}" if escaped_dash
+
         parsed_pairs.delete(key)
 
         [key, value_prefix || "", value_suffix || "", parsed_pairs]
@@ -98,7 +105,10 @@ module SimpleScripting
           adapted_switches_definition[i] = "[#{definition}]" if definition.is_a?(String) && !definition.start_with?('[')
         end
 
-        SimpleScripting::Argv.decode(*adapted_switches_definition, arguments: processed_argv.dup, auto_help: false)
+        adapted_argv = processed_argv.dup
+        adapted_argv[marked_word_position] = adapted_argv[marked_word_position].delete_prefix("-") if escaped_dash
+
+        SimpleScripting::Argv.decode(*adapted_switches_definition, arguments: adapted_argv, auto_help: false)
       rescue Argv::InvalidCommand, Argv::ArgumentError, OptionParser::InvalidOption
         # OptionParser::InvalidOption: see case "-O<tab>" in test suite.
 
